@@ -8,23 +8,32 @@ import {
 } from "drizzle-orm/pg-core";
 import { InferSelectModel, InferInsertModel } from "drizzle-orm";
 
-// 🧱 SQL Table Definition
+/**
+ * 🧱 Teams Table Schema
+ * Defines structure for all team records.
+ */
 export const teams = pgTable(
   "teams",
   {
-    id: uuid("id").primaryKey().defaultRandom(),
+    // 🆔 Primary key (UUID auto-generated)
+    id: uuid("id").defaultRandom().primaryKey(),
 
+    // 📄 Document status
     documentStatus: boolean("document_status").notNull().default(true),
-    teamName: text("team_name").notNull(),          
-    teamInitials: text("team_initials"),             
-    teamType: text("team_type"),                    
+
+    // 🏷️ Team core info
+    teamName: text("team_name").notNull(),           // Unique team name
+    teamInitials: text("team_initials"),             // Optional initials
+    teamType: text("team_type"),                     // Contractor, Consultant, etc.
     teamAddress: text("team_address"),
     teamTelephone: text("team_telephone"),
     teamEmail: text("team_email"),
-    teamRole: text("team_role"),
+    teamRole: text("team_role"),                     // Developer, QA, etc.
 
+    // ✅ Active flag
     active: boolean("active").notNull().default(true),
 
+    // 👤 Audit fields
     createdUser: text("created_user"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
@@ -35,10 +44,14 @@ export const teams = pgTable(
       .defaultNow(),
   },
   (t) => [
-    uniqueIndex("uq_teams_name").on(t.teamName),
+    // 🧩 Add unique index to prevent duplicates in bulk uploads
+    uniqueIndex("uq_teams_team_name").on(t.teamName),
   ]
 );
 
-// 🧩 TypeScript Models
-export type Team = InferSelectModel<typeof teams>;     // SELECT result type
-export type NewTeam = InferInsertModel<typeof teams>;  // INSERT payload type
+/**
+ * 🧩 TypeScript Models
+ * Infer types directly from Drizzle schema
+ */
+export type Team = InferSelectModel<typeof teams>; // SELECT result type
+export type NewTeam = InferInsertModel<typeof teams>; // INSERT payload type

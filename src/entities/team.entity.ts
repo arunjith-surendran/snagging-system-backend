@@ -13,21 +13,21 @@ class TeamEntity {
   public updatedUser: string | null;
   public updatedAt: Date | null;
 
-  constructor(
-    documentStatus: boolean,
-    teamName: string,
-    teamInitials: string | null,
-    teamType: string | null,
-    teamAddress: string | null,
-    teamTelephone: string | null,
-    teamEmail: string | null,
-    teamRole: string | null,
-    active: boolean,
-    createdUser: string | null,
-    createdAt: Date | null,
-    updatedUser: string | null,
-    updatedAt: Date | null
-  ) {
+  constructor({
+    documentStatus = true,
+    teamName,
+    teamInitials = null,
+    teamType = null,
+    teamAddress = null,
+    teamTelephone = null,
+    teamEmail = null,
+    teamRole = null,
+    active = true,
+    createdUser = "system-upload",
+    createdAt = new Date(),
+    updatedUser = "system-upload",
+    updatedAt = new Date(),
+  }: Partial<TeamEntity> & { teamName: string }) {
     this.documentStatus = documentStatus;
     this.teamName = teamName;
     this.teamInitials = teamInitials;
