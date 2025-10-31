@@ -3,6 +3,8 @@ class IssueEntity {
 
   public projectId: string;
   public unitId: string;
+  public projectName: string;
+  public unitNumber: string;
 
   public status: string;
 
@@ -16,6 +18,14 @@ class IssueEntity {
   public priority: string;
   public dueDate: Date | null;
 
+  public mediaBase64: string | null;
+  public mediaContentType: string | null;
+
+  public comments: string | null;
+  public category: string | null;
+  public issueType: string | null;
+  public issueItem: string | null;
+
   public createdUser: string | null;
   public createdAt: Date | null;
   public updatedUser: string | null;
@@ -25,6 +35,8 @@ class IssueEntity {
     documentStatus: string | null,
     projectId: string,
     unitId: string,
+    projectName: string,
+    unitNumber: string,
     status: string,
     createdByTeam: string | null,
     createdByUser: string | null,
@@ -34,6 +46,12 @@ class IssueEntity {
     description: string | null,
     priority: string,
     dueDate: Date | null,
+    mediaBase64: string | null,
+    mediaContentType: string | null,
+    comments: string | null,
+    category: string | null,
+    issueType: string | null,
+    issueItem: string | null,
     createdUser: string | null,
     createdAt: Date | null,
     updatedUser: string | null,
@@ -43,6 +61,8 @@ class IssueEntity {
 
     this.projectId = projectId;
     this.unitId = unitId;
+    this.projectName = projectName;
+    this.unitNumber = unitNumber;
 
     this.status = status;
 
@@ -55,6 +75,14 @@ class IssueEntity {
     this.description = description;
     this.priority = priority;
     this.dueDate = dueDate;
+
+    this.mediaBase64 = mediaBase64;
+    this.mediaContentType = mediaContentType;
+
+    this.comments = comments;
+    this.category = category;
+    this.issueType = issueType;
+    this.issueItem = issueItem;
 
     this.createdUser = createdUser;
     this.createdAt = createdAt;

@@ -6,12 +6,11 @@ import {
   index,
 } from "drizzle-orm/pg-core";
 import { InferSelectModel, InferInsertModel } from "drizzle-orm";
+
 import { projects } from "../projects/projects.schema";
 import { units } from "../units/units.schema";
 import { teams } from "../teams/teams.schema";
 import { users } from "../users/users.schema";
-
-
 
 // 🧱 SQL Table Definition
 export const issues = pgTable(
@@ -28,6 +27,9 @@ export const issues = pgTable(
     unitId: uuid("unit_id")
       .notNull()
       .references(() => units.id, { onDelete: "cascade" }),
+
+    projectName: text("project_name").notNull(),
+    unitNumber: text("unit_number").notNull(),
 
     // e.g., 'Open' | 'Fixed' | 'Verified' | 'Reopened' | 'Closed'
     status: text("status").notNull(),
@@ -51,6 +53,14 @@ export const issues = pgTable(
 
     dueDate: timestamp("due_date", { withTimezone: true }),
 
+    mediaBase64: text("media_base64"),
+    mediaContentType: text("media_content_type"),
+
+    comments: text("comments"),
+    category: text("category"),
+    issueType: text("issue_type"),
+    issueItem: text("issue_item"),
+
     createdUser: text("created_user"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
@@ -71,5 +81,5 @@ export const issues = pgTable(
 );
 
 // 🧩 TypeScript Models
-export type Issue = InferSelectModel<typeof issues>; // SELECT result type
+export type Issue = InferSelectModel<typeof issues>;   // SELECT result type
 export type NewIssue = InferInsertModel<typeof issues>; // INSERT payload type

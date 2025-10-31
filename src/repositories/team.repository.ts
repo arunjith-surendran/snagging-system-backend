@@ -54,7 +54,19 @@ const getAllTeams = async (
   return { teams: data, totalCount, hasNext };
 };
 
+/**
+ * ✅ Get All Teams for Export 
+ * @function getAllTeamsForExport
+ * @description Fetches all team records from the database without pagination,
+ * @returns {Promise<Team[]>} - Returns an array of all team records from the database.
+ */
+const getAllTeamsForExport = async (): Promise<Team[]> => {
+  const result = await db.select().from(teams);
+  return result;
+};
+
 export default {
   bulkInsert,
   getAllTeams,
+  getAllTeamsForExport
 };

@@ -97,24 +97,24 @@ const findEmailAlreadyExists = async (
   return result.length ? (result[0] as IUser) : null;
 };
 
-/**
- * ✅ Get all users — simple pagination only (no sorting)
- * @param {number} pageNumber - Current page
- * @param {number} pageSize - Page size
- * @returns {Promise<{ users: IUser[]; totalCount: number; hasNext: boolean }>}
- */
-const getAllUsers = async (
-  pageNumber: number,
-  pageSize: number
-): Promise<{ users: IUser[]; totalCount: number; hasNext: boolean }> => {
-  // 🚀 Use generic paginate helper — no ordering
-  const { data, totalCount, hasNext } = await paginate<IUser>(
-    users,
-    { pageNumber, pageSize }
-  );
+  /**
+   * ✅ Get all users — simple pagination only (no sorting)
+   * @param {number} pageNumber - Current page
+   * @param {number} pageSize - Page size
+   * @returns {Promise<{ users: IUser[]; totalCount: number; hasNext: boolean }>}
+   */
+  const getAllUsers = async (
+    pageNumber: number,
+    pageSize: number
+  ): Promise<{ users: IUser[]; totalCount: number; hasNext: boolean }> => {
+    // 🚀 Use generic paginate helper — no ordering
+    const { data, totalCount, hasNext } = await paginate<IUser>(
+      users,
+      { pageNumber, pageSize }
+    );
 
-  return { users: data, totalCount, hasNext };
-};
+    return { users: data, totalCount, hasNext };
+  };
 
 
 /**

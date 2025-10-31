@@ -4,6 +4,9 @@ export interface IIssue {
 
   projectId: string;
   unitId: string;
+  projectName: string;
+  unitNumber: string;
+
   status: string; // 'Open' | 'Fixed' | 'Verified' | 'Reopened' | 'Closed'
 
   createdByTeam: string | null;
@@ -15,6 +18,14 @@ export interface IIssue {
   description?: string | null;
   priority: string; // 'low' | 'medium' | 'high'
   dueDate?: Date | null;
+
+  mediaBase64?: string | null;
+  mediaContentType?: string | null;
+
+  comments?: string | null;
+  category?: string | null;
+  issueType?: string | null;
+  issueItem?: string | null;
 
   createdUser: string | null;
   createdAt: Date | null;
