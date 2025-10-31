@@ -3,7 +3,7 @@ import path from "path";
 import ExcelJS from "exceljs";
 import { Response } from "express";
 import userRepository from "../repositories/user.repository";
-import { IUser } from "../models/users/users.model";
+import { IUser, UserRole } from "../models/users/users.model";
 import UserEntity from "../entities/user.entity";
 import { validateBadRequest, validateDocumentExists, validateRequiredField } from "../utils/validators";
 import { safeDeleteFile } from "../middlewares/upload/file-utils";
@@ -26,24 +26,30 @@ const getAllUsers = async (pageNumber: number, pageSize: number): Promise<{ user
  */
 const createUser = async (userData: IUser): Promise<IUser> => {
   // 🧩 1️⃣ Validate required fields
-  validateRequiredField(userData.fullName, 'Full Name');
-  validateRequiredField(userData.email, 'Email');
-  validateRequiredField(userData.userRole, 'User Role');
+  validateRequiredField(userData.fullName, "Full Name");
+  validateRequiredField(userData.email, "Email");
+  validateRequiredField(userData.userRole, "User Role");
 
   // 🧩 2️⃣ Validate email format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  validateBadRequest(!emailRegex.test(userData.email), 'Invalid email format');
+  validateBadRequest(!emailRegex.test(userData.email), "Invalid email format");
 
   // 🧩 3️⃣ Check if email already exists
   const emailTaken = await userRepository.isEmailTaken(userData.email);
-  validateDocumentExists(emailTaken, 'Email');
+  validateDocumentExists(emailTaken, "Email");
 
-  // 🧩 5️⃣ Create entity instance
-  const userEntity: UserEntity = new UserEntity(
-    userData.documentStatus ?? 'active',
+  // 🧩 4️⃣ Validate User Role (must be from enum)
+  const validRoles = Object.values(UserRole);
+  if (!validRoles.includes(userData.userRole)) {
+    throw new Error(`Invalid user role: ${userData.userRole}. Must be one of ${validRoles.join(", ")}`);
+  }
+
+  // 🧩 5️⃣ Create entity instance (standardized & sanitized)
+  const userEntity = new UserEntity(
+    userData.documentStatus ?? "active",
     userData.fullName.trim(),
     userData.email.toLowerCase(),
-    userData.userRole ?? null,
+    userData.userRole, // ✅ strictly typed enum
     userData.teamId ?? null,
     userData.isProjectAdmin ?? false,
     userData.isTeamAdmin ?? false,
@@ -54,7 +60,7 @@ const createUser = async (userData: IUser): Promise<IUser> => {
   );
 
   // 🧩 6️⃣ Save user to DB
-  const newUser = await userRepository.createUser(userEntity as any);
+  const newUser = await userRepository.createUser(userEntity);
 
   return newUser;
 };

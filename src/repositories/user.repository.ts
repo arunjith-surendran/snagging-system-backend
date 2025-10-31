@@ -1,9 +1,9 @@
-import { db } from "../db_connection/postgres/connection";
-import { users } from "../models/users/users.schema";
-import { IUser } from "../models/users/users.model";
-import { paginate } from "../helper/pagination.helper";
-import { eq } from "drizzle-orm";
-import UserEntity from "../entities/user.entity";
+import { db } from '../db_connection/postgres/connection';
+import { users } from '../models/users/users.schema';
+import { IUser } from '../models/users/users.model';
+import { paginate } from '../helper/pagination.helper';
+import { eq } from 'drizzle-orm';
+import UserEntity from '../entities/user.entity';
 
 /**
  * ✅ Get all users (Paginated)
@@ -11,10 +11,7 @@ import UserEntity from "../entities/user.entity";
  * @param {number} pageSize
  * @returns {Promise<{ users: IUser[]; totalCount: number; hasNext: boolean }>}
  */
-const getAllUsers = async (
-  pageNumber: number,
-  pageSize: number
-): Promise<{ users: IUser[]; totalCount: number; hasNext: boolean }> => {
+const getAllUsers = async (pageNumber: number, pageSize: number): Promise<{ users: IUser[]; totalCount: number; hasNext: boolean }> => {
   const { data, totalCount, hasNext } = await paginate<IUser>(users, {
     pageNumber,
     pageSize,
@@ -40,18 +37,38 @@ const isEmailTaken = async (email: string): Promise<boolean> => {
  */
 const createUser = async (newUser: UserEntity): Promise<IUser> => {
   // 🧹 Convert null → undefined (Drizzle expects undefined for optional fields)
-  const cleanedUser: any = Object.fromEntries(
-    Object.entries(newUser).map(([key, value]) => [key, value ?? undefined])
-  ) as unknown as any;
+  const cleanedUser: any = Object.fromEntries(Object.entries(newUser).map(([key, value]) => [key, value ?? undefined])) as unknown as any;
 
   // ✅ Insert into DB
   const [inserted] = await db.insert(users).values(cleanedUser).returning();
   return inserted;
 };
 
+/**
+ * ✅ Insert Multiple Users (Bulk Upload)
+ */
+const bulkInsert = async (data: UserEntity[]): Promise<number> => {
+  if (!data.length) return 0;
+  const cleanedData = data.map((u) => Object.fromEntries(Object.entries(u).filter(([, v]) => v !== undefined && v !== null)));
+  const result = await db
+    .insert(users)
+    .values(cleanedData as any)
+    .onConflictDoNothing()
+    .returning();
+  return result.length;
+};
+
+/**
+ * ✅ Get All Users for Export (no pagination)
+ */
+const getAllUsersForExport = async (): Promise<IUser[]> => {
+  return await db.select().from(users);
+};
 
 export default {
   getAllUsers,
   createUser,
-  isEmailTaken, // 👈 added here
+  isEmailTaken,
+  bulkInsert,
+  getAllUsersForExport,
 };
