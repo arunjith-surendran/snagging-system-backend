@@ -11,7 +11,7 @@ export interface IUser {
 
   fullName: string;
   email: string;
-  userRole?: string | null;
+  userRole: UserRole | null; // 
 
   teamId?: string | null;
   isProjectAdmin: boolean;

@@ -38,27 +38,24 @@ const createUser = async (userData: IUser): Promise<IUser> => {
   const emailTaken = await userRepository.isEmailTaken(userData.email);
   validateDocumentExists(emailTaken, "Email");
 
-  // 🧩 4️⃣ Validate User Role (must be from enum)
   const validRoles = Object.values(UserRole);
-  if (!validRoles.includes(userData.userRole)) {
-    throw new Error(`Invalid user role: ${userData.userRole}. Must be one of ${validRoles.join(", ")}`);
-  }
+if (!validRoles.includes(userData.userRole as UserRole)) {
+  throw new Error(`Invalid user role: ${userData.userRole}. Must be one of ${validRoles.join(", ")}`);
+}
 
-  // 🧩 5️⃣ Create entity instance (standardized & sanitized)
-  const userEntity = new UserEntity(
-    userData.documentStatus ?? "active",
-    userData.fullName.trim(),
-    userData.email.toLowerCase(),
-    userData.userRole, // ✅ strictly typed enum
-    userData.teamId ?? null,
-    userData.isProjectAdmin ?? false,
-    userData.isTeamAdmin ?? false,
-    userData.createdUser ?? null,
-    new Date(),
-    userData.updatedUser ?? null,
-    new Date(),
-  );
-
+const userEntity = new UserEntity(
+  userData.documentStatus ?? "active",
+  userData.fullName.trim(),
+  userData.email.toLowerCase(),
+  userData.userRole as UserRole, // ✅ cast after validation
+  userData.teamId ?? null,
+  userData.isProjectAdmin ?? false,
+  userData.isTeamAdmin ?? false,
+  userData.createdUser ?? null,
+  new Date(),
+  userData.updatedUser ?? null,
+  new Date()
+);
   // 🧩 6️⃣ Save user to DB
   const newUser = await userRepository.createUser(userEntity);
 
@@ -70,39 +67,46 @@ const createUser = async (userData: IUser): Promise<IUser> => {
  */
 const importUsers = async (filePath: string): Promise<{ insertedCount: number }> => {
   try {
-    if (!fs.existsSync(filePath)) throw new Error('Uploaded file not found');
+    if (!fs.existsSync(filePath)) throw new Error("Uploaded file not found");
     const workbook = new ExcelJS.Workbook();
     const ext = path.extname(filePath).toLowerCase();
 
-    if (ext === '.csv') await workbook.csv.readFile(filePath);
+    if (ext === ".csv") await workbook.csv.readFile(filePath);
     else await workbook.xlsx.readFile(filePath);
 
     const worksheet = workbook.worksheets[0];
-    if (!worksheet) throw new Error('Invalid or empty file uploaded');
+    if (!worksheet) throw new Error("Invalid or empty file uploaded");
 
     const rows = worksheet.getSheetValues().slice(2);
-    if (!rows.length) throw new Error('File is empty or invalid format.');
+    if (!rows.length) throw new Error("File is empty or invalid format.");
 
     const entities: UserEntity[] = rows
       .map((row: any) => {
         if (!row || !row[2]) return null;
+
+        // 🧩 Convert role string from Excel into enum (type-safe)
+        const roleString = String(row[4] || "").trim();
+        const roleEnum = Object.values(UserRole).find(
+          (role) => role === roleString
+        ) ?? null;
+
         return new UserEntity(
-          'active',
-          String(row[2] || '').trim(),
-          String(row[3] || '').trim(),
-          String(row[4] || '').trim(),
+          "active",
+          String(row[2] || "").trim(), // full name
+          String(row[3] || "").trim(), // email
+          roleEnum, // ✅ properly typed UserRole | null
           null,
           false,
           false,
-          'system-upload',
+          "system-upload",
           new Date(),
-          'system-upload',
-          new Date(),
+          "system-upload",
+          new Date()
         );
       })
       .filter((u): u is UserEntity => !!u);
 
-    if (!entities.length) throw new Error('No valid user records found.');
+    if (!entities.length) throw new Error("No valid user records found.");
 
     const insertedCount = await userRepository.bulkInsert(entities);
     safeDeleteFile(filePath);
@@ -113,6 +117,7 @@ const importUsers = async (filePath: string): Promise<{ insertedCount: number }>
     throw error;
   }
 };
+
 
 /**
  * ✅ Download Users (Excel/CSV)
