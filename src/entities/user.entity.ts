@@ -1,11 +1,10 @@
-import { UserRole } from "../models/users/users.model";
-
+import { UserRole } from "../models/users/users.schema";
 
 class UserEntity {
   public documentStatus: string | null;
   public fullName: string;
   public email: string;
-  public userRole: UserRole | null; // ✅ strictly typed enum
+  public userRole: UserRole;
   public teamId: string | null;
   public isProjectAdmin: boolean;
   public isTeamAdmin: boolean;
@@ -18,7 +17,7 @@ class UserEntity {
     documentStatus: string | null,
     fullName: string,
     email: string,
-    userRole: UserRole | null, // ✅ use enum type
+    userRole: UserRole,
     teamId: string | null,
     isProjectAdmin: boolean,
     isTeamAdmin: boolean,
@@ -30,7 +29,7 @@ class UserEntity {
     this.documentStatus = documentStatus ?? "active";
     this.fullName = fullName.trim();
     this.email = email.toLowerCase();
-    this.userRole = userRole ?? null;
+    this.userRole = userRole;
     this.teamId = teamId ?? null;
     this.isProjectAdmin = isProjectAdmin ?? false;
     this.isTeamAdmin = isTeamAdmin ?? false;

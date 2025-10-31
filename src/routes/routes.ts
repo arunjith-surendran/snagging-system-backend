@@ -1,5 +1,5 @@
 import { Express, Router, Response, Request } from 'express';
-import { adminRouter, buildingRouter, issueTypeRouter, profileRouter, teamRouter, unitRouter, userRouter } from './v1/custom_routes';
+import { adminRouter, buildingRouter, issueTypeRouter, teamRouter, unitRouter, userRouter } from './v1/custom_routes';
 import projectRouter from './v1/custom_routes/project.route';
 
 export const routes = (app: Express) => {
@@ -8,7 +8,6 @@ export const routes = (app: Express) => {
   const v1Router = Router();
 
   v1Router.use('/admin', adminRouter(Router()));
-  v1Router.use('/profile', profileRouter(Router()));
   v1Router.use('/teams', teamRouter(Router()));
   v1Router.use('/projects', projectRouter(Router())); 
   v1Router.use('/buildings', buildingRouter(Router())); 

@@ -3,74 +3,56 @@ import path from "path";
 import ExcelJS from "exceljs";
 import { Response } from "express";
 import userRepository from "../repositories/user.repository";
-import { IUser, UserRole } from "../models/users/users.model";
+import { IUser } from "../models/users/users.model";
+import { UserRole } from "../models/users/users.schema";
 import UserEntity from "../entities/user.entity";
 import { validateBadRequest, validateDocumentExists, validateRequiredField } from "../utils/validators";
 import { safeDeleteFile } from "../middlewares/upload/file-utils";
 
-/**
- * ✅ Get all users (Paginated)
- * @param {number} pageNumber
- * @param {number} pageSize
- * @returns {Promise<{ users: IUser[]; hasNext: boolean; totalCount: number }>}
- */
-const getAllUsers = async (pageNumber: number, pageSize: number): Promise<{ users: IUser[]; hasNext: boolean; totalCount: number }> => {
+const getAllUsers = async (pageNumber: number, pageSize: number) => {
   const { users, hasNext, totalCount } = await userRepository.getAllUsers(pageNumber, pageSize);
   return { users, hasNext, totalCount };
 };
 
-/**
- * ✅ Create a new user (with validation + entity + duplicate email check)
- * @param {IUser} userData
- * @returns {Promise<IUser>}
- */
 const createUser = async (userData: IUser): Promise<IUser> => {
-  // 🧩 1️⃣ Validate required fields
   validateRequiredField(userData.fullName, "Full Name");
   validateRequiredField(userData.email, "Email");
   validateRequiredField(userData.userRole, "User Role");
 
-  // 🧩 2️⃣ Validate email format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   validateBadRequest(!emailRegex.test(userData.email), "Invalid email format");
 
-  // 🧩 3️⃣ Check if email already exists
   const emailTaken = await userRepository.isEmailTaken(userData.email);
   validateDocumentExists(emailTaken, "Email");
 
   const validRoles = Object.values(UserRole);
-if (!validRoles.includes(userData.userRole as UserRole)) {
-  throw new Error(`Invalid user role: ${userData.userRole}. Must be one of ${validRoles.join(", ")}`);
-}
+  if (!validRoles.includes(userData.userRole)) {
+    throw new Error(`Invalid user role: ${userData.userRole}. Must be one of ${validRoles.join(", ")}`);
+  }
 
-const userEntity = new UserEntity(
-  userData.documentStatus ?? "active",
-  userData.fullName.trim(),
-  userData.email.toLowerCase(),
-  userData.userRole as UserRole, // ✅ cast after validation
-  userData.teamId ?? null,
-  userData.isProjectAdmin ?? false,
-  userData.isTeamAdmin ?? false,
-  userData.createdUser ?? null,
-  new Date(),
-  userData.updatedUser ?? null,
-  new Date()
-);
-  // 🧩 6️⃣ Save user to DB
-  const newUser = await userRepository.createUser(userEntity);
+  const userEntity = new UserEntity(
+    userData.documentStatus ?? "active",
+    userData.fullName.trim(),
+    userData.email.toLowerCase(),
+    userData.userRole,
+    userData.teamId ?? null,
+    userData.isProjectAdmin ?? false,
+    userData.isTeamAdmin ?? false,
+    userData.createdUser ?? null,
+    new Date(),
+    userData.updatedUser ?? null,
+    new Date()
+  );
 
-  return newUser;
+  return await userRepository.createUser(userEntity);
 };
 
-/**
- * ✅ Import Users from File (Excel/CSV)
- */
 const importUsers = async (filePath: string): Promise<{ insertedCount: number }> => {
   try {
     if (!fs.existsSync(filePath)) throw new Error("Uploaded file not found");
+
     const workbook = new ExcelJS.Workbook();
     const ext = path.extname(filePath).toLowerCase();
-
     if (ext === ".csv") await workbook.csv.readFile(filePath);
     else await workbook.xlsx.readFile(filePath);
 
@@ -84,17 +66,16 @@ const importUsers = async (filePath: string): Promise<{ insertedCount: number }>
       .map((row: any) => {
         if (!row || !row[2]) return null;
 
-        // 🧩 Convert role string from Excel into enum (type-safe)
         const roleString = String(row[4] || "").trim();
-        const roleEnum = Object.values(UserRole).find(
-          (role) => role === roleString
-        ) ?? null;
+        const roleEnum =
+          (Object.values(UserRole).find((r) => r === roleString) as UserRole) ||
+          UserRole.CONTRACTOR_TEAM;
 
         return new UserEntity(
           "active",
-          String(row[2] || "").trim(), // full name
-          String(row[3] || "").trim(), // email
-          roleEnum, // ✅ properly typed UserRole | null
+          String(row[2] || "").trim(),
+          String(row[3] || "").trim(),
+          roleEnum,
           null,
           false,
           false,
@@ -106,11 +87,8 @@ const importUsers = async (filePath: string): Promise<{ insertedCount: number }>
       })
       .filter((u): u is UserEntity => !!u);
 
-    if (!entities.length) throw new Error("No valid user records found.");
-
     const insertedCount = await userRepository.bulkInsert(entities);
     safeDeleteFile(filePath);
-
     return { insertedCount };
   } catch (error) {
     safeDeleteFile(filePath);
@@ -118,33 +96,29 @@ const importUsers = async (filePath: string): Promise<{ insertedCount: number }>
   }
 };
 
-
-/**
- * ✅ Download Users (Excel/CSV)
- */
-const downloadUsers = async (format: 'excel' | 'csv', res: Response) => {
+const downloadUsers = async (format: "excel" | "csv", res: Response) => {
   const allUsers = await userRepository.getAllUsersForExport();
-  validateBadRequest(!allUsers.length, 'No users found to export.');
+  validateBadRequest(!allUsers.length, "No users found to export.");
 
   const workbook = new ExcelJS.Workbook();
-  const sheet = workbook.addWorksheet('Users');
+  const sheet = workbook.addWorksheet("Users");
 
   sheet.addRow([
-    'ID',
-    'Document Status',
-    'Full Name',
-    'Email',
-    'User Role',
-    'Team ID',
-    'Is Project Admin',
-    'Is Team Admin',
-    'Created User',
-    'Created At',
-    'Updated User',
-    'Updated At',
+    "ID",
+    "Document Status",
+    "Full Name",
+    "Email",
+    "User Role",
+    "Team ID",
+    "Is Project Admin",
+    "Is Team Admin",
+    "Created User",
+    "Created At",
+    "Updated User",
+    "Updated At",
   ]);
 
-  allUsers.forEach((user: any) => {
+  allUsers.forEach((user) => {
     sheet.addRow([
       user.id,
       user.documentStatus,
@@ -161,16 +135,16 @@ const downloadUsers = async (format: 'excel' | 'csv', res: Response) => {
     ]);
   });
 
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const fileName = `users_${timestamp}.${format === 'csv' ? 'csv' : 'xlsx'}`;
+  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+  const fileName = `users_${timestamp}.${format === "csv" ? "csv" : "xlsx"}`;
 
-  if (format === 'csv') {
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+  if (format === "csv") {
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
     await workbook.csv.write(res);
   } else {
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
     await workbook.xlsx.write(res);
   }
 
@@ -178,9 +152,4 @@ const downloadUsers = async (format: 'excel' | 'csv', res: Response) => {
   return { fileName };
 };
 
-export default {
-  importUsers,
-  getAllUsers,
-  createUser,
-  downloadUsers,
-};
+export default { getAllUsers, createUser, importUsers, downloadUsers };

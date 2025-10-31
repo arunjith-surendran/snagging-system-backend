@@ -1,5 +1,4 @@
 export { default as adminService } from './admin.service';
-export { default as profileService } from './profile.service';
 export { default as teamService } from './team.service';
 export { default as projectService } from './project.service';
 export { default as buildingService } from './building.service';

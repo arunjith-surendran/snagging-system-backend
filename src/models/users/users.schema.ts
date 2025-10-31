@@ -10,6 +10,7 @@ import {
 import { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import { teams } from "../teams/teams.schema";
 
+// ✅ SINGLE source of truth for enum
 export enum UserRole {
   SUPER_ADMIN = "Super Admin/Admin",          // T1
   INSPECTOR_TEAM = "Inspector Team",          // T2
@@ -17,7 +18,6 @@ export enum UserRole {
   SUB_CONTRACTOR_TEAM = "Sub-Contractor Team",// T4
   QA_VERIFY_TEAM = "Inspector/Verify Team",   // T5
 }
-
 
 export const userRoleEnum = pgEnum("user_role", [
   UserRole.SUPER_ADMIN,
@@ -32,12 +32,12 @@ export const users = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
 
-    documentStatus: text("document_status").default("active"), // active | archived | deleted
+    documentStatus: text("document_status").default("active"),
 
     fullName: text("full_name").notNull(),
     email: text("email").notNull(),
 
-    // Strictly typed Enum — only valid UserRole values allowed
+    // ✅ Strictly typed enum — only valid UserRole values
     userRole: userRoleEnum("user_role").notNull(),
 
     teamId: uuid("team_id").references(() => teams.id, { onDelete: "set null" }),
@@ -57,8 +57,5 @@ export const users = pgTable(
   (t) => [uniqueIndex("uq_users_email").on(t.email)]
 );
 
-//
-// ✅ 4️⃣ Infer TypeScript Models
-//
-export type User = InferSelectModel<typeof users>;   // For SELECT queries
-export type NewUser = InferInsertModel<typeof users>; // For INSERT payloads
+export type User = InferSelectModel<typeof users>;
+export type NewUser = InferInsertModel<typeof users>;
