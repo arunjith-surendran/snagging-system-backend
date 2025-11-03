@@ -15,11 +15,13 @@ import ERROR from '../middlewares/web_server/http-error';
  * @function importTeams
  * @description Reads uploaded file, validates rows, and inserts new team records into DB.
  */
-const importTeams = async (filePath: string, userId: string): Promise<{ insertedCount: number }> => {
+const importTeams = async (
+  filePath: string,
+  userId: string
+): Promise<{ insertedCount: number }> => {
   try {
     // 🧩 Validate file existence
     validateBadRequest(!fs.existsSync(filePath), `Uploaded file not found: ${filePath}`);
-    // validateUserAuthorization(userId);
     console.log("📄 Reading uploaded file:", filePath);
 
     const workbook = new ExcelJS.Workbook();
@@ -41,40 +43,42 @@ const importTeams = async (filePath: string, userId: string): Promise<{ inserted
 
     const entities: TeamEntity[] = rows
       .map((row: any, index: number) => {
-        // ⚠️ Some ExcelJS sheets return undefined at index 0
         const cells = Array.isArray(row) ? row : [];
         const teamName = String(cells[2] || "").trim();
         const teamInitials = String(cells[3] || "").trim();
-        const rawType = String(cells[4] || "").trim().toLowerCase();
+        const teamType = String(cells[4] || "").trim(); // ✅ now plain string
         const address = String(cells[5] || "").trim();
         const tel = String(cells[6] || "").trim();
         const email = String(cells[7] || "").trim();
-        const role = String(cells[8] || "").trim();
+        const rawRole = String(cells[8] || "").trim().toUpperCase();
 
         if (!teamName) return null; // skip empty row
 
-        // ✅ STRICT VALIDATION: teamType required
-        if (!rawType) {
+        // ✅ Validate that role matches UserRole enum
+        if (!rawRole) {
           throw new ERROR.ValidationError(
-            `❌ Missing teamType in row ${index + 2}. It must be one of: ${validRoles.join(", ")}`
-          );
-        }
-        if (!validRoles.includes(rawType as UserRole)) {
-          throw new ERROR.ValidationError(
-            `❌ Invalid teamType '${cells[4]}' in row ${index + 2}. Must be one of: ${validRoles.join(", ")}`
+            `❌ Missing teamRole in row ${index + 2}. It must be one of: ${validRoles.join(", ")}`
           );
         }
 
-        const teamType = rawType as UserRole;
+        const normalizedRole = Object.values(UserRole).find(
+          (r) => r.toUpperCase() === rawRole
+        );
+
+        if (!normalizedRole) {
+          throw new ERROR.ValidationError(
+            `❌ Invalid teamRole '${rawRole}' in row ${index + 2}. Must be one of: ${validRoles.join(", ")}`
+          );
+        }
 
         return new TeamEntity({
           teamName,
           teamInitials: teamInitials || null,
-          teamType,
+          teamType: teamType || null, // ✅ plain string
           teamAddress: address || null,
           teamTelephone: tel || null,
           teamEmail: email ? email.toLowerCase() : null,
-          teamRole: role || null,
+          teamRole: normalizedRole as UserRole, // ✅ validated enum
           createdUser: userId,
           updatedUser: userId,
         });
@@ -87,11 +91,11 @@ const importTeams = async (filePath: string, userId: string): Promise<{ inserted
       documentStatus: e.documentStatus,
       teamName: e.teamName,
       teamInitials: e.teamInitials ?? undefined,
-      teamType: e.teamType,
+      teamType: e.teamType ?? undefined, // ✅ plain string
       teamAddress: e.teamAddress ?? undefined,
       teamTelephone: e.teamTelephone ?? undefined,
       teamEmail: e.teamEmail ?? undefined,
-      teamRole: e.teamRole ?? undefined,
+      teamRole: e.teamRole, // ✅ enum
       active: e.active,
       createdUser: userId,
       updatedUser: userId,
@@ -208,47 +212,47 @@ const downloadTeams = async (format: 'excel' | 'csv', res: Response, userId?: st
 const addTeam = async (userId: string, teamData: NewTeam): Promise<NewTeam> => {
   // 🧩 Step 1: Validate user & required fields
   validateUserAuthorization(userId);
-  validateRequiredField(teamData.teamName, 'teamName');
+  validateRequiredField(teamData.teamName, "teamName");
 
-  // 🧩 Step 2: Normalize and convert teamType to enum safely
-  let teamType: UserRole;
-  const rawType = String(teamData.teamType || '')
-    .trim()
-    .toLowerCase();
+  // 🧩 Step 2: Normalize and validate teamRole (enum)
+  const rawRole = String(teamData.teamRole || "").trim().toLowerCase();
 
-  switch (rawType) {
-    case 'super_admin_admin':
-      teamType = UserRole.SUPER_ADMIN_ADMIN;
+  let teamRole: UserRole;
+  switch (rawRole) {
+    case "super_admin_admin":
+      teamRole = UserRole.SUPER_ADMIN_ADMIN;
       break;
-    case 'inspector_team':
-      teamType = UserRole.INSPECTOR_TEAM;
+    case "inspector_team":
+      teamRole = UserRole.INSPECTOR_TEAM;
       break;
-    case 'contractor_team':
-      teamType = UserRole.CONTRACTOR_TEAM;
+    case "contractor_team":
+      teamRole = UserRole.CONTRACTOR_TEAM;
       break;
-    case 'sub_contractor_team':
-      teamType = UserRole.SUB_CONTRACTOR_TEAM;
+    case "sub_contractor_team":
+      teamRole = UserRole.SUB_CONTRACTOR_TEAM;
       break;
-    case 'qa_verify_team':
-      teamType = UserRole.QA_VERIFY_TEAM;
+    case "qa_verify_team":
+      teamRole = UserRole.QA_VERIFY_TEAM;
       break;
     default:
-      teamType = UserRole.CONTRACTOR_TEAM; // fallback
+      throw new ERROR.ValidationError(
+        `❌ Invalid teamRole '${rawRole}'. Must be one of: ${Object.values(UserRole).join(", ")}`
+      );
   }
 
-  // 🧩 Step 3: Create a TeamEntity instance (object-style constructor)
+  // 🧩 Step 3: Build TeamEntity (teamType is plain string)
   const teamEntity = new TeamEntity({
     documentStatus: teamData.documentStatus ?? true,
     teamName: teamData.teamName.trim(),
     teamInitials: teamData.teamInitials?.trim() ?? null,
-    teamType, 
+    teamType: teamData.teamType?.trim() ?? null, // ✅ plain text
     teamAddress: teamData.teamAddress?.trim() ?? null,
     teamTelephone: teamData.teamTelephone?.trim() ?? null,
     teamEmail: teamData.teamEmail?.toLowerCase() ?? null,
-    teamRole: teamData.teamRole?.trim() ?? null,
+    teamRole, // ✅ validated enum
     active: teamData.active ?? true,
-    createdUser: userId, // 👈 who created
-    updatedUser: userId, // 👈 who updated
+    createdUser: userId,
+    updatedUser: userId,
     createdAt: new Date(),
     updatedAt: new Date(),
   });
