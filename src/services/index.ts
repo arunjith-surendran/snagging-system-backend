@@ -5,3 +5,5 @@ export { default as buildingService } from './building.service';
 export { default as unitService } from './unit.service';
 export { default as issueTypeService } from './issueType.service';
 export { default as userService } from './user.service';
+export { default as authService } from './auth.service';
+export { default as issueService } from './issue.service';

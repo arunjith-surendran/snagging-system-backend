@@ -1,8 +1,10 @@
+import { UserRole } from "../types/user";
+
 class TeamEntity {
   public documentStatus: boolean;
   public teamName: string;
   public teamInitials: string | null;
-  public teamType: string | null;
+  public teamType: UserRole;
   public teamAddress: string | null;
   public teamTelephone: string | null;
   public teamEmail: string | null;
@@ -17,7 +19,7 @@ class TeamEntity {
     documentStatus = true,
     teamName,
     teamInitials = null,
-    teamType = null,
+    teamType = UserRole.CONTRACTOR_TEAM,
     teamAddress = null,
     teamTelephone = null,
     teamEmail = null,
@@ -29,13 +31,13 @@ class TeamEntity {
     updatedAt = new Date(),
   }: Partial<TeamEntity> & { teamName: string }) {
     this.documentStatus = documentStatus;
-    this.teamName = teamName;
-    this.teamInitials = teamInitials;
+    this.teamName = teamName.trim();
+    this.teamInitials = teamInitials?.trim() ?? null;
     this.teamType = teamType;
-    this.teamAddress = teamAddress;
-    this.teamTelephone = teamTelephone;
-    this.teamEmail = teamEmail;
-    this.teamRole = teamRole;
+    this.teamAddress = teamAddress?.trim() ?? null;
+    this.teamTelephone = teamTelephone?.trim() ?? null;
+    this.teamEmail = teamEmail?.toLowerCase() ?? null;
+    this.teamRole = teamRole?.trim() ?? null;
     this.active = active;
     this.createdUser = createdUser;
     this.createdAt = createdAt;

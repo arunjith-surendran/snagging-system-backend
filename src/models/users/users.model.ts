@@ -1,12 +1,14 @@
-import { UserRole } from "./users.schema";
+import { UserRole } from "../../types/user";
+
 
 export interface IUser {
   id: string;
-  documentStatus: string | null;
+  documentStatus: boolean
 
   fullName: string;
   email: string;
-  userRole: UserRole; // ✅ from schema (single source)
+  password: string; 
+  userRole: UserRole; 
 
   teamId?: string | null;
   isProjectAdmin: boolean;

@@ -1,9 +1,12 @@
+import { UserRole } from "../../types/user";
+
+
 export interface ITeam {
   id: string;
   documentStatus: boolean;
   teamName: string;
   teamInitials?: string | null;
-  teamType?: string | null;
+  teamType: UserRole; 
   teamAddress?: string | null;
   teamTelephone?: string | null;
   teamEmail?: string | null;

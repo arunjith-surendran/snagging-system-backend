@@ -9,18 +9,10 @@ import {
 } from "drizzle-orm/pg-core";
 import { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import { teams } from "../teams/teams.schema";
-
-// ✅ SINGLE source of truth for enum
-export enum UserRole {
-  SUPER_ADMIN = "Super Admin/Admin",          // T1
-  INSPECTOR_TEAM = "Inspector Team",          // T2
-  CONTRACTOR_TEAM = "Contractor Team",        // T3
-  SUB_CONTRACTOR_TEAM = "Sub-Contractor Team",// T4
-  QA_VERIFY_TEAM = "Inspector/Verify Team",   // T5
-}
+import { UserRole } from "../../types/user";
 
 export const userRoleEnum = pgEnum("user_role", [
-  UserRole.SUPER_ADMIN,
+  UserRole.SUPER_ADMIN_ADMIN,
   UserRole.INSPECTOR_TEAM,
   UserRole.CONTRACTOR_TEAM,
   UserRole.SUB_CONTRACTOR_TEAM,
@@ -31,20 +23,14 @@ export const users = pgTable(
   "users",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-
-    documentStatus: text("document_status").default("active"),
-
+    documentStatus: boolean("document_status").notNull().default(true),
     fullName: text("full_name").notNull(),
     email: text("email").notNull(),
-
-    // ✅ Strictly typed enum — only valid UserRole values
+    password: text("password").notNull(),
     userRole: userRoleEnum("user_role").notNull(),
-
     teamId: uuid("team_id").references(() => teams.id, { onDelete: "set null" }),
-
     isProjectAdmin: boolean("is_project_admin").notNull().default(false),
     isTeamAdmin: boolean("is_team_admin").notNull().default(false),
-
     createdUser: text("created_user"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()

@@ -5,4 +5,5 @@ export { default as buildingRepository } from './building.repository';
 export { default as unitRepository } from './unit.repository';
 export { default as issueTypeRepository } from './issueType.repository';
 export { default as userRepository } from './user.repository';
+export { default as issueRepository } from './issue.repository';
 

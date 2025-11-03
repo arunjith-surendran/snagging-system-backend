@@ -1,9 +1,10 @@
-import { UserRole } from "../models/users/users.schema";
+import { UserRole } from '../types/user';
 
 class UserEntity {
-  public documentStatus: string | null;
+  public documentStatus: boolean;
   public fullName: string;
   public email: string;
+  public password: string;
   public userRole: UserRole;
   public teamId: string | null;
   public isProjectAdmin: boolean;
@@ -14,9 +15,10 @@ class UserEntity {
   public updatedAt: Date | null;
 
   constructor(
-    documentStatus: string | null,
+    documentStatus: boolean,
     fullName: string,
     email: string,
+    password: string,
     userRole: UserRole,
     teamId: string | null,
     isProjectAdmin: boolean,
@@ -24,11 +26,12 @@ class UserEntity {
     createdUser: string | null,
     createdAt: Date | null,
     updatedUser: string | null,
-    updatedAt: Date | null
+    updatedAt: Date | null,
   ) {
-    this.documentStatus = documentStatus ?? "active";
+    this.documentStatus = documentStatus;
     this.fullName = fullName.trim();
     this.email = email.toLowerCase();
+    this.password = password; 
     this.userRole = userRole;
     this.teamId = teamId ?? null;
     this.isProjectAdmin = isProjectAdmin ?? false;

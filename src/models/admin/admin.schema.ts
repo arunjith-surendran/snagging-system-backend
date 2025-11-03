@@ -1,3 +1,4 @@
+// src/models/admin/admin.schema.ts
 import {
   pgTable,
   uuid,
@@ -15,7 +16,7 @@ export const admins = pgTable(
 
     documentStatus: boolean("document_status").notNull().default(true),
     adminUserName: text("admin_user_name").notNull(),
-    adminUserType: text("admin_user_type").notNull(),
+    adminUserType: text("admin_user_type").notNull(), // stored as string
     email: text("email").notNull(),
     password: text("password").notNull(),
 
@@ -24,11 +25,9 @@ export const admins = pgTable(
     updatedUser: text("updated_user"),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   },
-  (t) => [
-    uniqueIndex("uq_admins_email").on(t.email), // ensure unique email
-  ]
+  (t) => [uniqueIndex("uq_admins_email").on(t.email)]
 );
 
 // ✅ Type helpers
-export type Admin = InferSelectModel<typeof admins>;   // For SELECT queries
-export type NewAdmin = InferInsertModel<typeof admins>; // For INSERT queries
+export type Admin = InferSelectModel<typeof admins>;   // SELECT
+export type NewAdmin = InferInsertModel<typeof admins>; // INSERT

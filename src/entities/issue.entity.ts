@@ -1,5 +1,5 @@
 class IssueEntity {
-  public documentStatus: string | null;
+  public documentStatus: boolean
 
   public projectId: string;
   public unitId: string;
@@ -32,7 +32,7 @@ class IssueEntity {
   public updatedAt: Date | null;
 
   constructor(
-    documentStatus: string | null,
+    documentStatus: boolean,
     projectId: string,
     unitId: string,
     projectName: string,

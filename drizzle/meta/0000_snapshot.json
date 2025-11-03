@@ -1,5 +1,5 @@
 {
-  "id": "fb4b3155-960f-45ec-bc76-f66bfc9c6279",
+  "id": "faa6d4dd-9993-472f-907a-14eff867b60b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -232,10 +232,10 @@
         },
         "document_status": {
           "name": "document_status",
-          "type": "text",
+          "type": "boolean",
           "primaryKey": false,
-          "notNull": false,
-          "default": "'active'"
+          "notNull": true,
+          "default": true
         },
         "project_id": {
           "name": "project_id",
@@ -247,7 +247,7 @@
           "name": "unit_id",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "project_name": {
           "name": "project_name",
@@ -259,13 +259,14 @@
           "name": "unit_number",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "status": {
           "name": "status",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "'Open'"
         },
         "created_by_team": {
           "name": "created_by_team",
@@ -308,7 +309,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "default": "'medium'"
+          "default": "'Medium'"
         },
         "due_date": {
           "name": "due_date",
@@ -495,7 +496,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
+          "onDelete": "set null",
           "onUpdate": "no action"
         },
         "issues_created_by_team_teams_id_fk": {
@@ -749,13 +750,6 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "document_status": {
-          "name": "document_status",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'active'"
-        },
         "project_code": {
           "name": "project_code",
           "type": "text",
@@ -780,6 +774,61 @@
           "primaryKey": false,
           "notNull": false
         },
+        "location": {
+          "name": "location",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "phase": {
+          "name": "phase",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "assigned_inspector_id": {
+          "name": "assigned_inspector_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "assigned_contractor_id": {
+          "name": "assigned_contractor_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "assigned_sub_contractor_id": {
+          "name": "assigned_sub_contractor_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "assigned_verifier_id": {
+          "name": "assigned_verifier_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "document_status": {
+          "name": "document_status",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "start_date": {
+          "name": "start_date",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "end_date": {
+          "name": "end_date",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_user": {
           "name": "created_user",
           "type": "text",
@@ -790,7 +839,7 @@
           "name": "created_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "default": "now()"
         },
         "updated_user": {
@@ -803,7 +852,7 @@
           "name": "updated_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "default": "now()"
         }
       },
@@ -863,9 +912,10 @@
         },
         "team_type": {
           "name": "team_type",
-          "type": "text",
+          "type": "team_type_enum",
+          "typeSchema": "public",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "team_address": {
           "name": "team_address",
@@ -943,6 +993,93 @@
         }
       },
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.tokens": {
+      "name": "tokens",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "document_status": {
+          "name": "document_status",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "token": {
+          "name": "token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "token_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires": {
+          "name": "expires",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "blacklisted": {
+          "name": "blacklisted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "tokens_user_id_users_id_fk": {
+          "name": "tokens_user_id_users_id_fk",
+          "tableFrom": "tokens",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -1135,11 +1272,18 @@
           "primaryKey": false,
           "notNull": true
         },
-        "user_role": {
-          "name": "user_role",
+        "password": {
+          "name": "password",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
+        },
+        "user_role": {
+          "name": "user_role",
+          "type": "user_role",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
         },
         "team_id": {
           "name": "team_id",
@@ -1227,7 +1371,38 @@
       "isRLSEnabled": false
     }
   },
-  "enums": {},
+  "enums": {
+    "public.team_type_enum": {
+      "name": "team_type_enum",
+      "schema": "public",
+      "values": [
+        "super_admin_admin",
+        "inspector_team",
+        "contractor_team",
+        "sub_contractor_team",
+        "qa_verify_team"
+      ]
+    },
+    "public.token_type": {
+      "name": "token_type",
+      "schema": "public",
+      "values": [
+        "access",
+        "refresh"
+      ]
+    },
+    "public.user_role": {
+      "name": "user_role",
+      "schema": "public",
+      "values": [
+        "super_admin_admin",
+        "inspector_team",
+        "contractor_team",
+        "sub_contractor_team",
+        "qa_verify_team"
+      ]
+    }
+  },
   "schemas": {},
   "sequences": {},
   "roles": {},
