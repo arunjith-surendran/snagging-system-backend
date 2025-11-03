@@ -41,29 +41,29 @@ const getProjectById = async (userId: string, id: string): Promise<IProject> => 
 };
 
 /**
- * ✅ Create Project
- * @param {string} userId - Authenticated user ID (creator)
- * @param {Partial<IProject>} projectData - Project creation payload
- * @returns {Promise<IProject>}
- * @description Creates a new project record using ProjectEntity.
+ * ✅ Create Project Service
+ * @param {string} createdBy - Authenticated admin user ID
+ * @param {IProject} projectData - Request body
  */
 const createProject = async (
-  userId: string,
-  projectData: Partial<IProject>
+  createdBy: string,
+  projectData: IProject
 ): Promise<IProject> => {
-  validateUserAuthorization(userId);
-  validateRequiredField(projectData.projectName, "projectName");
-  validateRequiredField(projectData.projectCode, "projectCode");
+  validateUserAuthorization(createdBy);
 
-  // 🕒 Safely convert string dates to Date objects
-  const toDate = (value: string | Date | null | undefined): Date | null =>
-    value ? new Date(value) : null;
+  // 🧾 Required field checks
+  validateRequiredField(projectData.projectName, "Project Name");
+  validateRequiredField(projectData.projectCode, "Project Code");
 
-  // 🧱 Build the Project Entity (same pattern as UserEntity)
+  // 🕒 Convert safe dates
+  const toDate = (v: string | Date | null | undefined): Date | null =>
+    v ? new Date(v) : null;
+
+  // 🧱 Create Entity (similar to UserEntity)
   const projectEntity = new ProjectEntity(
     projectData.documentStatus ?? true,
-    projectData.projectCode!.trim(),
-    projectData.projectName!.trim(),
+    projectData.projectCode.trim(),
+    projectData.projectName.trim(),
     projectData.description ?? null,
     projectData.clientName ?? null,
     projectData.location ?? null,
@@ -74,18 +74,15 @@ const createProject = async (
     projectData.assignedVerifierId ?? null,
     toDate(projectData.startDate),
     toDate(projectData.endDate),
-    userId,               // createdUser
-    new Date(),           // createdAt
-    projectData.updatedUser ?? null,
-    new Date()            // updatedAt
+    createdBy,
+    new Date(),
+    createdBy,
+    new Date()
   );
 
-  // 💾 Save to DB via repository
   const createdProject = await projectRepository.createProject(projectEntity);
   return createdProject;
 };
-
-
 
 /**
  * ✅ Update Project

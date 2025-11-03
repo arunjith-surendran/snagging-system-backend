@@ -37,35 +37,25 @@ const getProjectById = async (id: string): Promise<IProject | null> => {
 };
 
 /**
- * ✅ Create Project Repository (Fixed)
- * Converts camelCase → snake_case before insert
+ * ✅ Create Project Repository
+ *  @function getProjectById
+ * @param {string} id - Project ID
+ * @returns {Promise<IProject | null>}
+ * @description 
  */
 const createProject = async (newProject: ProjectEntity): Promise<IProject> => {
-  const projectValues:any = {
-    document_status: newProject.documentStatus ?? true,
-    project_code: newProject.projectCode,
-    project_name: newProject.projectName,
-    description: newProject.description,
-    client_name: newProject.clientName,
-    location: newProject.location,
-    phase: newProject.phase,
-    assigned_inspector_id: newProject.assignedInspectorId,
-    assigned_contractor_id: newProject.assignedContractorId,
-    assigned_sub_contractor_id: newProject.assignedSubContractorId,
-    assigned_verifier_id: newProject.assignedVerifierId,
-    start_date: newProject.startDate,
-    end_date: newProject.endDate,
-    created_user: newProject.createdUser,
-    created_at: newProject.createdAt ?? new Date(),
-    updated_user: newProject.updatedUser,
-    updated_at: newProject.updatedAt ?? new Date(),
-  };
+  const cleaned:any = Object.fromEntries(
+    Object.entries(newProject).map(([k, v]) => [k, v ?? null])
+  );
 
-  const [inserted] = await db.insert(projects).values(projectValues).returning();
+  const [inserted] = await db
+    .insert(projects)
+    .values(cleaned)
+    .onConflictDoNothing({ target: projects.projectCode }) // optional safeguard
+    .returning();
+
   return inserted;
 };
-
-
 /**
  * ✅ Update Project
  * @function updateProject

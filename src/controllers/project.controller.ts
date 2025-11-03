@@ -1,7 +1,8 @@
-import { Request, Response, NextFunction } from "express";
-import ApiResponse from "../utils/api-response";
-import { projectService } from "../services";
-import { IProject } from "../models/projects/projects.model";
+import { Request, Response, NextFunction } from 'express';
+import ApiResponse from '../utils/api-response';
+import { projectService } from '../services';
+import { IProject } from '../models/projects/projects.model';
+import { AuthRequest } from '../middlewares/auth/verify-auth';
 
 /**
  * ✅ Get All Projects
@@ -15,15 +16,14 @@ import { IProject } from "../models/projects/projects.model";
 const getAllProjects = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const userId = (req as any).user?.id;
-    const pageNumber = parseInt((req.query.pageNumber as string) || "1", 10);
-    const pageSize = parseInt((req.query.pageSize as string) || "10", 10);
+    const pageNumber = parseInt((req.query.pageNumber as string) || '1', 10);
+    const pageSize = parseInt((req.query.pageSize as string) || '10', 10);
 
     const { projects, hasNext, totalCount } = await projectService.getAllProjects(userId, pageNumber, pageSize);
 
-    const apiResponse: ApiResponse<{ projects: IProject[]; hasNext: boolean; totalCount: number }> =
-      new ApiResponse();
+    const apiResponse: ApiResponse<{ projects: IProject[]; hasNext: boolean; totalCount: number }> = new ApiResponse();
     apiResponse.statusCode = 200;
-    apiResponse.message = "✅ Projects fetched successfully!";
+    apiResponse.message = '✅ Projects fetched successfully!';
     apiResponse.data = { projects, hasNext, totalCount };
 
     res.json(apiResponse);
@@ -49,7 +49,7 @@ const getProjectById = async (req: Request, res: Response, next: NextFunction): 
 
     const apiResponse = new ApiResponse();
     apiResponse.statusCode = 200;
-    apiResponse.message = "✅ Project fetched successfully!";
+    apiResponse.message = '✅ Project fetched successfully!';
     apiResponse.data = project;
 
     res.json(apiResponse);
@@ -67,17 +67,19 @@ const getProjectById = async (req: Request, res: Response, next: NextFunction): 
  * @param {NextFunction} next - Express next middleware
  * @description Creates a new project record in the database.
  */
-const createProject = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+const createProject = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const userId = (req as any).user?.id;
-    const createdProject = await projectService.createProject(userId, req.body);
+    const projectData = req.body as IProject;
+    const createdBy = req.user?.id || null;
 
-    const apiResponse = new ApiResponse();
-    apiResponse.statusCode = 201;
-    apiResponse.message = "✅ Project created successfully!";
-    apiResponse.data = createdProject;
+    const project = await projectService.createProject(createdBy!, projectData);
 
-    res.status(201).json(apiResponse);
+    const response = new ApiResponse<{ project: IProject }>();
+    response.statusCode = 201;
+    response.message = '✅ Project created successfully!';
+    response.data = { project };
+
+    res.status(201).json(response);
   } catch (error) {
     next(error);
   }
@@ -100,7 +102,7 @@ const updateProject = async (req: Request, res: Response, next: NextFunction): P
 
     const apiResponse = new ApiResponse();
     apiResponse.statusCode = 200;
-    apiResponse.message = "✅ Project updated successfully!";
+    apiResponse.message = '✅ Project updated successfully!';
     apiResponse.data = updatedProject;
 
     res.json(apiResponse);
@@ -126,7 +128,7 @@ const deleteProject = async (req: Request, res: Response, next: NextFunction): P
 
     const apiResponse = new ApiResponse();
     apiResponse.statusCode = 200;
-    apiResponse.message = "🗑️ Project deleted successfully!";
+    apiResponse.message = '🗑️ Project deleted successfully!';
     apiResponse.data = { id };
 
     res.json(apiResponse);
@@ -153,7 +155,7 @@ const assignTeamToProject = async (req: Request, res: Response, next: NextFuncti
 
     const apiResponse = new ApiResponse();
     apiResponse.statusCode = 200;
-    apiResponse.message = "✅ Team assigned to project successfully!";
+    apiResponse.message = '✅ Team assigned to project successfully!';
     apiResponse.data = result;
 
     res.json(apiResponse);
@@ -178,7 +180,7 @@ const getProjectsByInspector = async (req: Request, res: Response, next: NextFun
 
     const apiResponse = new ApiResponse();
     apiResponse.statusCode = 200;
-    apiResponse.message = "✅ Inspector projects fetched successfully!";
+    apiResponse.message = '✅ Inspector projects fetched successfully!';
     apiResponse.data = data;
 
     res.json(apiResponse);
@@ -203,7 +205,7 @@ const getProjectsByContractor = async (req: Request, res: Response, next: NextFu
 
     const apiResponse = new ApiResponse();
     apiResponse.statusCode = 200;
-    apiResponse.message = "✅ Contractor projects fetched successfully!";
+    apiResponse.message = '✅ Contractor projects fetched successfully!';
     apiResponse.data = data;
 
     res.json(apiResponse);
@@ -228,7 +230,7 @@ const getProjectsBySubContractor = async (req: Request, res: Response, next: Nex
 
     const apiResponse = new ApiResponse();
     apiResponse.statusCode = 200;
-    apiResponse.message = "✅ Sub-contractor projects fetched successfully!";
+    apiResponse.message = '✅ Sub-contractor projects fetched successfully!';
     apiResponse.data = data;
 
     res.json(apiResponse);

@@ -6,11 +6,11 @@ export interface ITeam {
   documentStatus: boolean;
   teamName: string;
   teamInitials?: string | null;
-  teamType: UserRole; 
+  teamType: string | null;
   teamAddress?: string | null;
   teamTelephone?: string | null;
   teamEmail?: string | null;
-  teamRole?: string | null;
+  teamRole?: UserRole;
   active: boolean;
   createdUser: string | null;
   createdAt: Date | null;

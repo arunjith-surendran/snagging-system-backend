@@ -1,3 +1,4 @@
+// src/models/projects/projects.schema.ts
 import {
   pgTable,
   uuid,
