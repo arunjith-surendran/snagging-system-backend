@@ -1,5 +1,5 @@
 {
-  "id": "faa6d4dd-9993-472f-907a-14eff867b60b",
+  "id": "77fce9a7-e291-4ffb-baf3-31101b9f5fb3",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -750,6 +750,13 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
+        "document_status": {
+          "name": "document_status",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
         "project_code": {
           "name": "project_code",
           "type": "text",
@@ -788,34 +795,27 @@
         },
         "assigned_inspector_id": {
           "name": "assigned_inspector_id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },
         "assigned_contractor_id": {
           "name": "assigned_contractor_id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },
         "assigned_sub_contractor_id": {
           "name": "assigned_sub_contractor_id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },
         "assigned_verifier_id": {
           "name": "assigned_verifier_id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": false
-        },
-        "document_status": {
-          "name": "document_status",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": true
         },
         "start_date": {
           "name": "start_date",
@@ -839,7 +839,7 @@
           "name": "created_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         },
         "updated_user": {
@@ -852,7 +852,7 @@
           "name": "updated_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
@@ -912,10 +912,9 @@
         },
         "team_type": {
           "name": "team_type",
-          "type": "team_type_enum",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "team_address": {
           "name": "team_address",
@@ -937,9 +936,11 @@
         },
         "team_role": {
           "name": "team_role",
-          "type": "text",
+          "type": "team_role_enum",
+          "typeSchema": "public",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": "'contractor_team'"
         },
         "active": {
           "name": "active",
@@ -1255,10 +1256,10 @@
         },
         "document_status": {
           "name": "document_status",
-          "type": "text",
+          "type": "boolean",
           "primaryKey": false,
-          "notNull": false,
-          "default": "'active'"
+          "notNull": true,
+          "default": true
         },
         "full_name": {
           "name": "full_name",
@@ -1372,8 +1373,8 @@
     }
   },
   "enums": {
-    "public.team_type_enum": {
-      "name": "team_type_enum",
+    "public.team_role_enum": {
+      "name": "team_role_enum",
       "schema": "public",
       "values": [
         "super_admin_admin",

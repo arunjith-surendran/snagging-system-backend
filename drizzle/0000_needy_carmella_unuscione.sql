@@ -1,4 +1,4 @@
-CREATE TYPE "public"."team_type_enum" AS ENUM('super_admin_admin', 'inspector_team', 'contractor_team', 'sub_contractor_team', 'qa_verify_team');--> statement-breakpoint
+CREATE TYPE "public"."team_role_enum" AS ENUM('super_admin_admin', 'inspector_team', 'contractor_team', 'sub_contractor_team', 'qa_verify_team');--> statement-breakpoint
 CREATE TYPE "public"."token_type" AS ENUM('access', 'refresh');--> statement-breakpoint
 CREATE TYPE "public"."user_role" AS ENUM('super_admin_admin', 'inspector_team', 'contractor_team', 'sub_contractor_team', 'qa_verify_team');--> statement-breakpoint
 CREATE TABLE "admins" (
@@ -82,23 +82,23 @@ CREATE TABLE "issue_types" (
 --> statement-breakpoint
 CREATE TABLE "projects" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"document_status" boolean DEFAULT true NOT NULL,
 	"project_code" text NOT NULL,
 	"project_name" text NOT NULL,
 	"description" text,
 	"client_name" text,
 	"location" text,
 	"phase" text,
-	"assigned_inspector_id" text,
-	"assigned_contractor_id" text,
-	"assigned_sub_contractor_id" text,
-	"assigned_verifier_id" text,
-	"document_status" boolean DEFAULT true NOT NULL,
+	"assigned_inspector_id" uuid,
+	"assigned_contractor_id" uuid,
+	"assigned_sub_contractor_id" uuid,
+	"assigned_verifier_id" uuid,
 	"start_date" timestamp with time zone,
 	"end_date" timestamp with time zone,
 	"created_user" text,
-	"created_at" timestamp with time zone DEFAULT now(),
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_user" text,
-	"updated_at" timestamp with time zone DEFAULT now()
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "teams" (
@@ -106,11 +106,11 @@ CREATE TABLE "teams" (
 	"document_status" boolean DEFAULT true NOT NULL,
 	"team_name" text NOT NULL,
 	"team_initials" text,
-	"team_type" "team_type_enum" NOT NULL,
+	"team_type" text,
 	"team_address" text,
 	"team_telephone" text,
 	"team_email" text,
-	"team_role" text,
+	"team_role" "team_role_enum" DEFAULT 'contractor_team',
 	"active" boolean DEFAULT true NOT NULL,
 	"created_user" text,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
@@ -148,7 +148,7 @@ CREATE TABLE "units" (
 --> statement-breakpoint
 CREATE TABLE "users" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"document_status" text DEFAULT 'active',
+	"document_status" boolean DEFAULT true NOT NULL,
 	"full_name" text NOT NULL,
 	"email" text NOT NULL,
 	"password" text NOT NULL,

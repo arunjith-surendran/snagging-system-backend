@@ -14,32 +14,27 @@ import { eq } from "drizzle-orm";
  */
 const bulkInsert = async (data: NewTeam[]): Promise<number> => {
   if (!data.length) {
-    console.warn('⚠️ No data received for team insert.');
+    console.warn("⚠️ No data received for team insert.");
     return 0;
   }
-
-  const cleanedData: NewTeam[] = data.map((team) => {
-    const validEntries = Object.entries(team).filter(([, value]) => value !== undefined && value !== null);
-    return Object.fromEntries(validEntries) as NewTeam;
-  });
 
   try {
     const result = await db
       .insert(teams)
-      .values(cleanedData)
+      .values(data) // ✅ insert all provided columns
       .onConflictDoNothing({ target: teams.teamName })
       .returning({ id: teams.id, teamName: teams.teamName });
 
-    console.log(
-      `✅ Inserted ${result.length} team(s):`,
-      result.map((r) => r.teamName),
-    );
+    console.log(`✅ Inserted ${result.length} team(s):`, result.map(r => r.teamName));
     return result.length;
   } catch (err) {
-    console.error('❌ Failed to insert teams:', err);
+    console.error("❌ Failed to insert teams:", err);
     throw err;
   }
 };
+
+
+
 
 /**
  * ✅ Get All Teams (Paginated)
