@@ -11,7 +11,10 @@ const userRouter = (router: Router): Router => {
   router.get('/download/excel', verifyAuth, authorizeModule('ADMIN'), userController.downloadUsersExcel);
   router.get('/download/csv', verifyAuth, authorizeModule('ADMIN'), userController.downloadUsersCsv);
   router.get('/get-profile-details', verifyAuth, userController.getProfileDetails);
-
+  router.put('/admin/update-user-team/:userId', verifyAuth, authorizeModule('ADMIN'), userController.updateUserTeam);
+  router.get('/admin/get-user-roles', verifyAuth, authorizeModule('ADMIN'), userController.getUserRoles);
+  router.put('/admin/update/:id', verifyAuth, authorizeModule('ADMIN'), userController.updateUserById);
+  router.delete('/admin/delete/:id', verifyAuth, authorizeModule('ADMIN'), userController.deleteUser);
   return router;
 };
 

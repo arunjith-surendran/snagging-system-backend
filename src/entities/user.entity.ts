@@ -7,6 +7,7 @@ class UserEntity {
   public password: string;
   public userRole: UserRole;
   public teamId: string | null;
+  public teamName: string | null;
   public isProjectAdmin: boolean;
   public isTeamAdmin: boolean;
   public createdUser: string | null;
@@ -21,6 +22,7 @@ class UserEntity {
     password: string,
     userRole: UserRole,
     teamId: string | null,
+    teamName: string | null,
     isProjectAdmin: boolean,
     isTeamAdmin: boolean,
     createdUser: string | null,
@@ -31,9 +33,10 @@ class UserEntity {
     this.documentStatus = documentStatus;
     this.fullName = fullName.trim();
     this.email = email.toLowerCase();
-    this.password = password; 
+    this.password = password;
     this.userRole = userRole;
     this.teamId = teamId ?? null;
+    this.teamName = teamName ?? null;
     this.isProjectAdmin = isProjectAdmin ?? false;
     this.isTeamAdmin = isTeamAdmin ?? false;
     this.createdUser = createdUser ?? null;

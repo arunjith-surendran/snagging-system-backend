@@ -1,19 +1,16 @@
-import { db } from "../db_connection/postgres/connection";
-import { users } from "../models/users/users.schema";
-import { IUser } from "../models/users/users.model";
-import { paginate } from "../helper/pagination.helper";
-import { eq } from "drizzle-orm";
-import UserEntity from "../entities/user.entity";
+import { db } from '../db_connection/postgres/connection';
+import { users } from '../models/users/users.schema';
+import { IUser } from '../models/users/users.model';
+import { paginate } from '../helper/pagination.helper';
+import { eq } from 'drizzle-orm';
+import UserEntity from '../entities/user.entity';
 
 /**
  * ✅ Get All Users (Paginated)
  * @function getAllUsers
  * @description Retrieves a paginated list of users.
  */
-const getAllUsers = async (
-  pageNumber: number,
-  pageSize: number
-): Promise<{ users: IUser[]; totalCount: number; hasNext: boolean }> => {
+const getAllUsers = async (pageNumber: number, pageSize: number): Promise<{ users: IUser[]; totalCount: number; hasNext: boolean }> => {
   const { data, totalCount, hasNext } = await paginate<IUser>(users, { pageNumber, pageSize });
   return { users: data, totalCount, hasNext };
 };
@@ -54,9 +51,7 @@ const isEmailTaken = async (email: string): Promise<boolean> => {
  * @function createUser
  */
 const createUser = async (newUser: UserEntity): Promise<IUser> => {
-  const cleanedUser: any = Object.fromEntries(
-    Object.entries(newUser).map(([key, value]) => [key, value ?? undefined])
-  );
+  const cleanedUser: any = Object.fromEntries(Object.entries(newUser).map(([key, value]) => [key, value ?? undefined]));
   const [inserted] = await db.insert(users).values(cleanedUser).returning();
   return inserted;
 };
@@ -67,10 +62,12 @@ const createUser = async (newUser: UserEntity): Promise<IUser> => {
  */
 const bulkInsert = async (data: UserEntity[]): Promise<number> => {
   if (!data.length) return 0;
-  const cleanedData = data.map((u) =>
-    Object.fromEntries(Object.entries(u).filter(([, v]) => v !== undefined && v !== null))
-  );
-  const result = await db.insert(users).values(cleanedData as any).onConflictDoNothing().returning();
+  const cleanedData = data.map((u) => Object.fromEntries(Object.entries(u).filter(([, v]) => v !== undefined && v !== null)));
+  const result = await db
+    .insert(users)
+    .values(cleanedData as any)
+    .onConflictDoNothing()
+    .returning();
   return result.length;
 };
 
@@ -82,6 +79,21 @@ const getAllUsersForExport = async (): Promise<IUser[]> => {
   return await db.select().from(users);
 };
 
+/**
+ * ✅ Update user by ID
+ */
+const updateUser = async (id: string, updatedData: Partial<any>): Promise<IUser> => {
+  const [updated] = await db.update(users).set(updatedData).where(eq(users.id, id)).returning();
+  return updated;
+};
+
+/**
+ * ✅ Delete user by ID
+ */
+const deleteUser = async (id: string): Promise<void> => {
+  await db.delete(users).where(eq(users.id, id));
+};
+
 export default {
   getAllUsers,
   findByEmail,
@@ -89,5 +101,7 @@ export default {
   createUser,
   bulkInsert,
   getAllUsersForExport,
-  findById
+  findById,
+  updateUser,
+  deleteUser,
 };

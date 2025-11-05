@@ -6,9 +6,10 @@ import { Response } from 'express';
 import userRepository from '../repositories/user.repository';
 import { IUser } from '../models/users/users.model';
 import UserEntity from '../entities/user.entity';
-import { validateBadRequest, validateDocumentExists, validateRequiredField } from '../utils/validators';
+import { validateBadRequest, validateDocumentExists, validateRequiredField, validateUserAuthorization } from '../utils/validators';
 import { safeDeleteFile } from '../middlewares/upload/file-utils';
 import { UserRole } from '../types/user';
+import { teamRepository } from '../repositories';
 
 /**
  * ✅ Get All Users (Paginated)
@@ -42,6 +43,12 @@ const createUser = async (userData: IUser, createdBy: string | null): Promise<IU
 
   const hashedPassword = await bcrypt.hash(userData.password, 10);
 
+  let teamName: string | null = null;
+  if (userData.teamId) {
+    const team = await teamRepository.findById(userData.teamId);
+    teamName = team ? team.teamName : null;
+  }
+
   const userEntity = new UserEntity(
     true,
     userData.fullName.trim(),
@@ -49,9 +56,10 @@ const createUser = async (userData: IUser, createdBy: string | null): Promise<IU
     hashedPassword,
     userData.userRole,
     userData.teamId ?? null,
+    teamName,
     userData.isProjectAdmin ?? false,
     userData.isTeamAdmin ?? false,
-    createdBy, // 👈 set createdUser = admin id
+    createdBy,
     new Date(),
     userData.updatedUser ?? null,
     new Date(),
@@ -92,6 +100,7 @@ const importUsers = async (filePath: string): Promise<{ insertedCount: number }>
           String(row[3] || '').trim(),
           defaultPassword,
           roleEnum,
+          null,
           null,
           false,
           false,
@@ -184,4 +193,60 @@ const getProfileDetails = async (userId: string): Promise<IUser> => {
   return safeUser as IUser;
 };
 
-export default { getAllUsers, createUser, importUsers, downloadUsers, getProfileDetails };
+/**
+ * ✅ Update User’s Team (Admin)
+ * @function updateUserTeam
+ */
+const updateUserTeam = async (adminId: string, userId: string, teamId: string) => {
+  validateUserAuthorization(adminId);
+  validateRequiredField(userId, 'userId');
+  validateRequiredField(teamId, 'teamId');
+
+  const user = await userRepository.findById(userId);
+  validateBadRequest(!user, 'User not found');
+
+  const updatedUser = await userRepository.updateUser(userId, {
+    teamId,
+    updatedUser: adminId,
+    updatedAt: new Date(),
+  });
+
+  return updatedUser;
+};
+
+/**
+ * ✅ Update user by ID
+ * @param {string} id - User ID
+ * @param {Partial<IUser>} updatedData - Updated user fields
+ * @returns {Promise<IUser>} Updated user record
+ */
+const updateUserById = async (id: string, updatedData: Partial<IUser>): Promise<IUser> => {
+  const userExists = await userRepository.findById(id);
+  validateBadRequest(!userExists, 'User not found');
+
+  const updatedUser = await userRepository.updateUser(id, updatedData);
+  return updatedUser;
+};
+
+/**
+ * ✅ Delete user by ID
+ * @param {string} id - User ID
+ * @returns {Promise<void>}
+ */
+const deleteUser = async (id: string): Promise<void> => {
+  const userExists = await userRepository.findById(id);
+  validateBadRequest(!userExists, 'User not found');
+
+  await userRepository.deleteUser(id);
+};
+
+export default {
+  getAllUsers,
+  createUser,
+  importUsers,
+  downloadUsers,
+  getProfileDetails,
+  updateUserTeam,
+  updateUserById,
+  deleteUser,
+};
