@@ -59,6 +59,7 @@ export const issues = pgTable(
     category: text("category"),
     issueType: text("issue_type"),
     issueItem: text("issue_item"),
+    location:text().notNull(),
 
     createdUser: text("created_user"),
     createdAt: timestamp("created_at", { withTimezone: true })

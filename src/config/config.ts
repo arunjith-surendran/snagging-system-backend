@@ -29,15 +29,15 @@ interface AppConfig {
 
 const config: AppConfig = {
   // 🌐 Server Configuration
-  port: Number(process.env.PORT) || 5000,
+  port: Number(process.env.PORT) || 6000,
 
   // 🐘 PostgreSQL Configuration
   postgres: {
-    host: process.env.PGHOST || "localhost",
-    user: process.env.PGUSER || "postgres",
-    password: process.env.PGPASSWORD || "admin123",
-    database: process.env.PGDATABASE || "snagging_system",
-    port: Number(process.env.PGPORT) || 5432,
+    host: process.env.PGHOST || 'localhost',
+    user: process.env.PGUSER || 'postgres',
+    password: process.env.PGPASSWORD || 'postgres',
+    database: process.env.PGDATABASE || 'snagging_system',
+    port: Number(process.env.PGPORT) || 5433,
   },
 
   // 🔐 JWT Configuration

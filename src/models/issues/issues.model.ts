@@ -35,6 +35,7 @@ export interface IIssue {
   category?: string | null;
   issueType?: string | null;
   issueItem?: string | null;
+  location?: string | null;
   createdUser: string | null;
   createdAt: Date | null;
   updatedUser: string | null;

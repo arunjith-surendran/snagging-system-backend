@@ -1,9 +1,9 @@
 import {
   pgTable,
-  uuid,
+  // uuid,
   text,
   boolean,
-  timestamp,
+  // timestamp,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { InferSelectModel, InferInsertModel } from "drizzle-orm";
@@ -12,24 +12,19 @@ import { InferSelectModel, InferInsertModel } from "drizzle-orm";
 export const issue_types = pgTable(
   "issue_types",
   {
-    id: uuid("id").primaryKey().defaultRandom(),
-
-    documentStatus: text("document_status").default("active"), // active | archived | deleted
-
-    category: text("category").notNull(),  // e.g., Electrical, Plumbing
-    type: text("type").notNull(),          // e.g., Switches, Pipes
-    item: text("item").notNull(),          // e.g., Light switch, Faucet
-
-    current: boolean("current").notNull().default(true),
-
-    createdUser: text("created_user"),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-    updatedUser: text("updated_user"),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
+    // id: uuid("id").primaryKey().defaultRandom(),
+    category: text("Category").notNull(),  // e.g., Electrical, Plumbing
+    type: text("Type").notNull(),          // e.g., Switches, Pipes
+    item: text("Item").notNull(),          // e.g., Light switch, Faucet
+    current: boolean("Current").notNull().default(true),
+    // createdUser: text("created_user"),
+    // createdAt: timestamp("created_at", { withTimezone: true })
+    //   .notNull()
+    //   .defaultNow(),
+    // updatedUser: text("updated_user"),
+    // updatedAt: timestamp("updated_at", { withTimezone: true })
+    //   .notNull()
+    //   .defaultNow(),
   },
   (t) => [
     // ✅ Unique index on Category + Type + Item

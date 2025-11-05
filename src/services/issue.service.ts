@@ -16,16 +16,11 @@ import {
  * @description Fetches all issues with pagination.
  */
 const getAllIssues = async (
-  userId: string,
-  pageNumber: number,
-  pageSize: number
-): Promise<{ issues: IIssue[]; totalCount: number; hasNext: boolean }> => {
+  userId: string
+): Promise<{ issues: IIssue[]; totalCount: number;}> => {
   validateUserAuthorization(userId);
-  const { issues, totalCount, hasNext } = await issueRepository.getAllIssues(
-    pageNumber,
-    pageSize
-  );
-  return { issues, totalCount, hasNext };
+  const { issues, totalCount } = await issueRepository.getAllIssues();
+  return { issues, totalCount };
 };
 
 /**
@@ -81,6 +76,7 @@ const createIssue = async (
     issueData.category ?? null, // category
     issueData.issueType ?? null, // issueType
     issueData.issueItem ?? null, // issueItem
+    issueData.location ?? null,
     userId, // createdUser
     new Date(), // createdAt
     userId, // updatedUser
@@ -188,6 +184,7 @@ const createIssueByInspector = async (
     issueData.category ?? null,                   // category
     issueData.issueType ?? null,                  // issueType
     issueData.issueItem ?? null,                  // issueItem
+    issueData.location ?? null, 
     userId,                                       // createdUser
     new Date(),                                   // createdAt
     userId,                                       // updatedUser

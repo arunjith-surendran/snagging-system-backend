@@ -14,7 +14,7 @@ export const routes = (app: Express) => {
   v1Router.use('/issue-types', issueTypeRouter(Router()));
   v1Router.use('/users', userRouter(Router()));
   v1Router.use('/auth', authRouter(Router()));
-  v1Router.use('/issue', issueRouter(Router()));
+  v1Router.use('/issues', issueRouter(Router()));
 
   router.use('/api/v1', v1Router);
 

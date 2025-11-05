@@ -14,15 +14,12 @@ import { issueService } from "../services";
 const getAllIssues = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const userId = (req as any).user?.id;
-    const pageNumber = parseInt((req.query.pageNumber as string) || "1", 10);
-    const pageSize = parseInt((req.query.pageSize as string) || "10", 10);
-
-    const { issues, hasNext, totalCount } = await issueService.getAllIssues(userId, pageNumber, pageSize);
+    const { issues, totalCount } = await issueService.getAllIssues(userId);
 
     const apiResponse = new ApiResponse();
     apiResponse.statusCode = 200;
     apiResponse.message = "✅ Issues fetched successfully!";
-    apiResponse.data = { issues, hasNext, totalCount };
+    apiResponse.data = { issues, totalCount };
 
     res.json(apiResponse);
   } catch (error) {

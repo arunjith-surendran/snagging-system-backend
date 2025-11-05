@@ -25,6 +25,7 @@ class IssueEntity {
   public category: string | null;
   public issueType: string | null;
   public issueItem: string | null;
+  public location: string | null;
 
   public createdUser: string | null;
   public createdAt: Date | null;
@@ -52,6 +53,7 @@ class IssueEntity {
     category: string | null,
     issueType: string | null,
     issueItem: string | null,
+    location: string | null,
     createdUser: string | null,
     createdAt: Date | null,
     updatedUser: string | null,
@@ -83,6 +85,7 @@ class IssueEntity {
     this.category = category;
     this.issueType = issueType;
     this.issueItem = issueItem;
+    this.location = location;
 
     this.createdUser = createdUser;
     this.createdAt = createdAt;
