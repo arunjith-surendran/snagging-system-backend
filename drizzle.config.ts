@@ -1,17 +1,35 @@
 import { defineConfig } from "drizzle-kit";
+import dotenv from "dotenv";
+import path from "path";
+import { parse } from "pg-connection-string";
+
+// 🧠 Always load production env for Drizzle
+const envFile = path.resolve(process.cwd(), ".env.production");
+dotenv.config({ path: envFile });
+console.log(`✅ Loaded environment file for Drizzle: ${envFile}`);
+
+// ✅ Ensure DATABASE_URL is available
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) {
+  throw new Error("❌ DATABASE_URL not found in .env.production");
+}
+
+// Parse safely
+const parsed = parse(databaseUrl);
 
 export default defineConfig({
-  dialect: "postgresql",
-  schema: "./src/models/**/*.schema.ts",
   out: "./drizzle",
+  schema: "./src/models/**/*.schema.ts",
+  dialect: "postgresql",
   dbCredentials: {
-    host: process.env.PGHOST || "localhost",
-    port: Number(process.env.PGPORT) || 5432,
-    user: process.env.PGUSER || "postgres",
-    password: process.env.PGPASSWORD || "admin123",
-    database: process.env.PGDATABASE || "Snagging_Tool",
-
-    // 🚨 Add this line to disable SSL
-    ssl: false,
+    host: parsed.host || "localhost",
+    port: parsed.port ? Number(parsed.port) : 5432,
+    user: parsed.user || "postgres",
+    password: parsed.password || "",
+    database: parsed.database || "Snagging_Tool",
+    ssl:
+      process.env.SSL_ENABLED === "true"
+        ? { rejectUnauthorized: false }
+        : false,
   },
 });
