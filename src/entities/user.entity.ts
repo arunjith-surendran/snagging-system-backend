@@ -1,9 +1,13 @@
+import { UserRole } from '../types/user';
+
 class UserEntity {
-  public documentStatus: string | null;
+  public documentStatus: boolean;
   public fullName: string;
   public email: string;
-  public userRole: string | null;
+  public password: string;
+  public userRole: UserRole;
   public teamId: string | null;
+  public teamName: string | null;
   public isProjectAdmin: boolean;
   public isTeamAdmin: boolean;
   public createdUser: string | null;
@@ -12,29 +16,33 @@ class UserEntity {
   public updatedAt: Date | null;
 
   constructor(
-    documentStatus: string | null,
+    documentStatus: boolean,
     fullName: string,
     email: string,
-    userRole: string | null,
+    password: string,
+    userRole: UserRole,
     teamId: string | null,
+    teamName: string | null,
     isProjectAdmin: boolean,
     isTeamAdmin: boolean,
     createdUser: string | null,
     createdAt: Date | null,
     updatedUser: string | null,
-    updatedAt: Date | null
+    updatedAt: Date | null,
   ) {
     this.documentStatus = documentStatus;
-    this.fullName = fullName;
-    this.email = email;
+    this.fullName = fullName.trim();
+    this.email = email.toLowerCase();
+    this.password = password;
     this.userRole = userRole;
-    this.teamId = teamId;
-    this.isProjectAdmin = isProjectAdmin;
-    this.isTeamAdmin = isTeamAdmin;
-    this.createdUser = createdUser;
-    this.createdAt = createdAt;
-    this.updatedUser = updatedUser;
-    this.updatedAt = updatedAt;
+    this.teamId = teamId ?? null;
+    this.teamName = teamName ?? null;
+    this.isProjectAdmin = isProjectAdmin ?? false;
+    this.isTeamAdmin = isTeamAdmin ?? false;
+    this.createdUser = createdUser ?? null;
+    this.createdAt = createdAt ?? new Date();
+    this.updatedUser = updatedUser ?? null;
+    this.updatedAt = updatedAt ?? new Date();
   }
 }
 

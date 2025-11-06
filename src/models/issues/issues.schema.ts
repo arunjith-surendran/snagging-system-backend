@@ -2,16 +2,17 @@ import {
   pgTable,
   uuid,
   text,
+  boolean,
   timestamp,
   index,
 } from "drizzle-orm/pg-core";
 import { InferSelectModel, InferInsertModel } from "drizzle-orm";
+
 import { projects } from "../projects/projects.schema";
 import { units } from "../units/units.schema";
 import { teams } from "../teams/teams.schema";
 import { users } from "../users/users.schema";
-
-
+import { IssuePriority, IssueStatus } from "./issues.model";
 
 // 🧱 SQL Table Definition
 export const issues = pgTable(
@@ -19,18 +20,18 @@ export const issues = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
 
-    documentStatus: text("document_status").default("active"), // active | deleted | archived
+    documentStatus: boolean("document_status").notNull().default(true),
 
     projectId: uuid("project_id")
       .notNull()
       .references(() => projects.id, { onDelete: "cascade" }),
 
-    unitId: uuid("unit_id")
-      .notNull()
-      .references(() => units.id, { onDelete: "cascade" }),
+    unitId: uuid("unit_id").references(() => units.id, { onDelete: "set null" }),
 
-    // e.g., 'Open' | 'Fixed' | 'Verified' | 'Reopened' | 'Closed'
-    status: text("status").notNull(),
+    projectName: text("project_name").notNull(),
+    unitNumber: text("unit_number"),
+
+    status: text("status").notNull().default(IssueStatus.OPEN),
 
     createdByTeam: uuid("created_by_team").references(() => teams.id, {
       onDelete: "set null",
@@ -47,9 +48,17 @@ export const issues = pgTable(
 
     title: text("title").notNull(),
     description: text("description"),
-    priority: text("priority").notNull().default("medium"),
+    priority: text("priority").notNull().default(IssuePriority.MEDIUM),
 
     dueDate: timestamp("due_date", { withTimezone: true }),
+
+    mediaBase64: text("media_base64"),
+    mediaContentType: text("media_content_type"),
+
+    comments: text("comments"),
+    category: text("category"),
+    issueType: text("issue_type"),
+    issueItem: text("issue_item"),
 
     createdUser: text("created_user"),
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -71,5 +80,5 @@ export const issues = pgTable(
 );
 
 // 🧩 TypeScript Models
-export type Issue = InferSelectModel<typeof issues>; // SELECT result type
-export type NewIssue = InferInsertModel<typeof issues>; // INSERT payload type
+export type Issue = InferSelectModel<typeof issues>;
+export type NewIssue = InferInsertModel<typeof issues>;

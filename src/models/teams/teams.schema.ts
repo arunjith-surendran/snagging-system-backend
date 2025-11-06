@@ -5,35 +5,37 @@ import {
   boolean,
   timestamp,
   uniqueIndex,
+  pgEnum,
 } from "drizzle-orm/pg-core";
 import { InferSelectModel, InferInsertModel } from "drizzle-orm";
+import { UserRole } from "../../types/user";
 
-/**
- * 🧱 Teams Table Schema
- * Defines structure for all team records.
- */
+export const teamRoleEnum = pgEnum("team_role_enum", [
+  UserRole.SUPER_ADMIN_ADMIN,
+  UserRole.INSPECTOR_TEAM,
+  UserRole.CONTRACTOR_TEAM,
+  UserRole.SUB_CONTRACTOR_TEAM,
+  UserRole.QA_VERIFY_TEAM,
+]);
+
 export const teams = pgTable(
   "teams",
   {
-    // 🆔 Primary key (UUID auto-generated)
     id: uuid("id").defaultRandom().primaryKey(),
-
-    // 📄 Document status
     documentStatus: boolean("document_status").notNull().default(true),
 
-    // 🏷️ Team core info
-    teamName: text("team_name").notNull(),           // Unique team name
-    teamInitials: text("team_initials"),             // Optional initials
-    teamType: text("team_type"),                     // Contractor, Consultant, etc.
+    // ✅ Only `teamName` is required
+    teamName: text("team_name").notNull(),
+
+    // ✅ All other fields optional
+    teamInitials: text("team_initials"),
+    teamType: text("team_type"), // plain string (optional)
     teamAddress: text("team_address"),
     teamTelephone: text("team_telephone"),
     teamEmail: text("team_email"),
-    teamRole: text("team_role"),                     // Developer, QA, etc.
-
-    // ✅ Active flag
+    teamRole: teamRoleEnum("team_role").default(UserRole.CONTRACTOR_TEAM), // optional, default
     active: boolean("active").notNull().default(true),
 
-    // 👤 Audit fields
     createdUser: text("created_user"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
@@ -43,15 +45,8 @@ export const teams = pgTable(
       .notNull()
       .defaultNow(),
   },
-  (t) => [
-    // 🧩 Add unique index to prevent duplicates in bulk uploads
-    uniqueIndex("uq_teams_team_name").on(t.teamName),
-  ]
+  (t) => [uniqueIndex("uq_teams_team_name").on(t.teamName)]
 );
 
-/**
- * 🧩 TypeScript Models
- * Infer types directly from Drizzle schema
- */
-export type Team = InferSelectModel<typeof teams>; // SELECT result type
-export type NewTeam = InferInsertModel<typeof teams>; // INSERT payload type
+export type Team = InferSelectModel<typeof teams>;
+export type NewTeam = InferInsertModel<typeof teams>;

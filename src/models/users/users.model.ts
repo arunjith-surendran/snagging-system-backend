@@ -1,12 +1,20 @@
+import { UserRole } from "../../types/user";
+
+/**
+ * ✅ IUser — represents a complete user record including optional team info
+ */
 export interface IUser {
   id: string;
-  documentStatus: string | null;
+  documentStatus: boolean;
 
   fullName: string;
   email: string;
-  userRole?: string | null;
+  password: string;
+  userRole: UserRole;
 
   teamId?: string | null;
+  teamName?: string | null; 
+
   isProjectAdmin: boolean;
   isTeamAdmin: boolean;
 

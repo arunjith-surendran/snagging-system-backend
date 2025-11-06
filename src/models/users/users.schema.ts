@@ -5,23 +5,40 @@ import {
   boolean,
   timestamp,
   uniqueIndex,
+  pgEnum,
 } from "drizzle-orm/pg-core";
 import { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import { teams } from "../teams/teams.schema";
+import { UserRole } from "../../types/user";
 
-// 🧱 SQL Table Definition
+/**
+ * ✅ Enum for user roles
+ */
+export const userRoleEnum = pgEnum("user_role", [
+  UserRole.SUPER_ADMIN_ADMIN,
+  UserRole.INSPECTOR_TEAM,
+  UserRole.CONTRACTOR_TEAM,
+  UserRole.SUB_CONTRACTOR_TEAM,
+  UserRole.QA_VERIFY_TEAM,
+]);
+
+/**
+ * ✅ Users table schema
+ */
 export const users = pgTable(
   "users",
   {
     id: uuid("id").primaryKey().defaultRandom(),
 
-    documentStatus: text("document_status").default("active"), // active | archived | deleted
+    documentStatus: boolean("document_status").notNull().default(true),
     fullName: text("full_name").notNull(),
     email: text("email").notNull(),
-    userRole: text("user_role"),
+    password: text("password").notNull(),
+    userRole: userRoleEnum("user_role").notNull(),
 
+    // 🧩 Relationship
     teamId: uuid("team_id").references(() => teams.id, { onDelete: "set null" }),
-
+    teamName: text("team_name"),
     isProjectAdmin: boolean("is_project_admin").notNull().default(false),
     isTeamAdmin: boolean("is_team_admin").notNull().default(false),
 
@@ -34,11 +51,14 @@ export const users = pgTable(
       .notNull()
       .defaultNow(),
   },
-  (t) => [
-    uniqueIndex("uq_users_email").on(t.email),
-  ]
+  (t) => [uniqueIndex("uq_users_email").on(t.email)]
 );
 
-// 🧩 TypeScript Models
-export type User = InferSelectModel<typeof users>;   // SELECT result type
-export type NewUser = InferInsertModel<typeof users>; // INSERT payload type
+/**
+ * ✅ Type definitions
+ */
+export type User = InferSelectModel<typeof users> & {
+  teamName?: string | null; // ✅ Virtual/computed field from join
+};
+
+export type NewUser = InferInsertModel<typeof users>;

@@ -1,30 +1,34 @@
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
+import path from "path";
 
-dotenv.config();
+// 🔒 Always load production env for deployment
+const envFile = path.resolve(process.cwd(), ".env.production");
 
-const config = {
-  // Server Configuration
-  port: process.env.PORT || 4000,
+dotenv.config({ path: envFile });
 
-  // PostgreSQL Configuration
-  postgres: {
-    host: process.env.PGHOST || 'localhost',
-    user: process.env.PGUSER || 'postgres',
-    password: process.env.PGPASSWORD || 'admin123',
-    database: process.env.PGDATABASE || 'snagging_system',
-    port: Number(process.env.PGPORT) || 5432,
-  },
-
-  // JWT Configuration
+console.log(`✅ Loaded environment file: ${envFile}`);
+interface AppConfig {
+  port: number;
+  databaseUrl: string;
+  sslEnabled: boolean;
   jwt: {
-    secret: process.env.JWT_SECRET || 'defaultsecretkey',
-    accessExpirationMinutes: Number(process.env.JWT_ACCESS_EXPIRATION_MINUTES) || 30,
-    refreshExpirationDays: Number(process.env.JWT_REFRESH_EXPIRATION_DAYS) || 7,
-  },
+    secret: string;
+    accessExpirationMinutes: number;
+    refreshExpirationDays: number;
+  };
+}
 
-  tokenTypes: {
-    ACCESS: 'access',
-    REFRESH: 'refresh',
+const config: AppConfig = {
+  port: Number(process.env.PORT) || 5000,
+  databaseUrl: process.env.DATABASE_URL || "",
+  sslEnabled:
+    String(process.env.SSL_ENABLED).trim().toLowerCase() === "true",
+  jwt: {
+    secret: process.env.JWT_SECRET || "defaultsecretkey",
+    accessExpirationMinutes:
+      Number(process.env.JWT_ACCESS_EXPIRATION_MINUTES) || 70,
+    refreshExpirationDays:
+      Number(process.env.JWT_REFRESH_EXPIRATION_DAYS) || 70,
   },
 };
 
