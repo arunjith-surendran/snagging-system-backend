@@ -1,7 +1,8 @@
-import { Request, Response, NextFunction } from "express";
-import ApiResponse from "../utils/api-response";
-import adminService from "../services/admin.service";
-import { IAdmin } from "../models/admin/admin.model";
+import { Request, Response, NextFunction } from 'express';
+import ApiResponse from '../utils/api-response';
+import adminService from '../services/admin.service';
+import { IAdmin } from '../models/admin/admin.model';
+
 
 /**
  * ✅ Create Admin
@@ -16,15 +17,10 @@ const addAdmin = async (req: Request, res: Response, next: NextFunction): Promis
   try {
     const { adminUserName, adminUserType, email, password } = req.body;
 
-    const admin: IAdmin = await adminService.createAdmin(
-      adminUserName,
-      adminUserType,
-      email,
-      password
-    );
+    const admin: IAdmin = await adminService.createAdmin(adminUserName, adminUserType, email, password);
 
     const apiResponse: ApiResponse<{ admin: IAdmin }> = new ApiResponse();
-    apiResponse.message = "✅ Admin created successfully!";
+    apiResponse.message = '✅ Admin created successfully!';
     apiResponse.statusCode = 201;
     apiResponse.data = { admin };
 
@@ -33,5 +29,7 @@ const addAdmin = async (req: Request, res: Response, next: NextFunction): Promis
     next(error);
   }
 };
+
+
 
 export default { addAdmin };

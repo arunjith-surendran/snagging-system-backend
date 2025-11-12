@@ -5,6 +5,8 @@ import { verifyAuth } from '../../../middlewares/auth/verify-auth';
 import { authorizeModule } from '../../../middlewares/auth/authorize-access';
 
 const userRouter = (router: Router): Router => {
+    router.get('/ping', userController.ping);
+     router.get('/info', userController.getUserInfo);
   router.post('/upload', verifyAuth, authorizeModule('ADMIN'), upload.single('file'), userController.uploadUsers);
   router.get('/get-all-users', verifyAuth, authorizeModule('ADMIN'), userController.getAllUsers);
   router.post('/create-user', verifyAuth, authorizeModule('ADMIN'), userController.createUser);
@@ -15,6 +17,8 @@ const userRouter = (router: Router): Router => {
   router.get('/admin/get-user-roles', verifyAuth, authorizeModule('ADMIN'), userController.getUserRoles);
   router.put('/admin/update/:id', verifyAuth, authorizeModule('ADMIN'), userController.updateUserById);
   router.delete('/admin/delete/:id', verifyAuth, authorizeModule('ADMIN'), userController.deleteUser);
+  router.get('/access-rules/get-rules', userController.getRoleAccessConfig);
+
   return router;
 };
 

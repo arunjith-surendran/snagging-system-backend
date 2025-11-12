@@ -1,14 +1,14 @@
 {
   "name": "snagging-system-backend",
   "version": "1.0.0",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
   "description": "Backend API for Snagging System using Express, Drizzle ORM, and PostgreSQL",
   "author": "Arunjith Surendran",
   "license": "ISC",
   "scripts": {
     "dev": "nodemon --watch src --ext ts --exec \"npx ts-node src/index.ts\"",
-    "build": "tsc",
-    "start": "node dist/index.js",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node -r tsconfig-paths/register dist/index.js",
     "generate": "drizzle-kit generate",
     "migrate": "drizzle-kit migrate",
     "lint": "eslint src/**/*.ts --fix"
@@ -27,6 +27,7 @@
     "multer": "^2.0.2",
     "pg": "^8.16.3",
     "pg-connection-string": "^2.9.1",
+    "tsconfig-paths": "^4.2.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

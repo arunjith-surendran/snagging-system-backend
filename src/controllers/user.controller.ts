@@ -4,6 +4,8 @@ import { IUser } from '../models/users/users.model';
 import { userService } from '../services';
 import { AuthRequest } from '../middlewares/auth/verify-auth';
 import { UserRole } from '../types/user';
+import { RoleAccessConfig } from '../config/role-access.config';
+
 
 /**
  * ✅ Upload Users (CSV/Excel)
@@ -192,6 +194,7 @@ const updateUserTeam = async (req: Request, res: Response, next: NextFunction): 
 const getUserRoles = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const roles = Object.values(UserRole);
+    
     const filteredRoles = roles.filter((role) => role !== UserRole.SUPER_ADMIN_ADMIN);
 
     const apiResponse = new ApiResponse();
@@ -216,9 +219,10 @@ const getUserRoles = async (req: Request, res: Response, next: NextFunction): Pr
 const updateUserById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { id } = req.params;
+    const adminId = (req as any).user?.id;
     const updatedData = req.body;
 
-    const updatedUser = await userService.updateUserById(id, updatedData);
+    const updatedUser = await userService.updateUserById(id, updatedData,adminId);
 
     const apiResponse = new ApiResponse();
     apiResponse.statusCode = 200;
@@ -243,8 +247,8 @@ const updateUserById = async (req: Request, res: Response, next: NextFunction): 
 const deleteUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { id } = req.params;
-
-    await userService.deleteUser(id);
+    const adminId = (req as any).user?.id;
+    await userService.deleteUser(id,adminId);
 
     const apiResponse = new ApiResponse();
     apiResponse.statusCode = 200;
@@ -252,6 +256,69 @@ const deleteUser = async (req: Request, res: Response, next: NextFunction): Prom
     apiResponse.data = { deletedUserId: id };
 
     res.json(apiResponse);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * ✅ Get Role Access Configuration
+ * @route GET /api/v1/admin/role-access
+ * @description Returns success message (Role access config currently commented out)
+ * @access Public (restricted in production)
+ */
+const getRoleAccessConfig = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    console.log('✅ getRoleAccessConfig reached controller');
+
+    const apiResponse = new ApiResponse();
+    apiResponse.status = true;
+    apiResponse.statusCode = 200;
+    apiResponse.message = '✅ Role Access Configuration fetched successfully!';
+    // apiResponse.data = RoleAccessConfig; // temporarily disabled
+
+    res.status(200).json(apiResponse);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * ✅ Ping API
+ * @route GET /api/v1/users/ping
+ * @description Simple endpoint to verify the User API is running
+ * @access Public
+ */
+const ping = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const apiResponse = new ApiResponse<{ timestamp: string }>();
+    apiResponse.status = true;
+    apiResponse.statusCode = 200;
+    apiResponse.message = '✅ User API is live and authenticated!';
+    apiResponse.data = { timestamp: new Date().toISOString() };
+
+    res.status(200).json(apiResponse);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * ✅ User Info (Role Access Config)
+ * @route GET /api/v1/users/info
+ * @description Returns the complete RoleAccessConfig object
+ * @access Public (for testing)
+ */
+const getUserInfo = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const apiResponse = new ApiResponse<typeof RoleAccessConfig>();
+
+    apiResponse.status = true;
+    apiResponse.statusCode = 200;
+    apiResponse.message = '✅ Role Access Configuration fetched successfully!';
+    apiResponse.data = RoleAccessConfig;
+
+    res.status(200).json(apiResponse);
   } catch (error) {
     next(error);
   }
@@ -267,5 +334,9 @@ export default {
   updateUserTeam,
   getUserRoles,
   updateUserById,
-  deleteUser
+  deleteUser,
+  getRoleAccessConfig,
+  ping,
+  getUserInfo
+
 };

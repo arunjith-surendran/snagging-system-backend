@@ -220,9 +220,10 @@ const updateUserTeam = async (adminId: string, userId: string, teamId: string) =
  * @param {Partial<IUser>} updatedData - Updated user fields
  * @returns {Promise<IUser>} Updated user record
  */
-const updateUserById = async (id: string, updatedData: Partial<IUser>): Promise<IUser> => {
+const updateUserById = async (id: string, updatedData: Partial<IUser>, adminId: string): Promise<IUser> => {
   const userExists = await userRepository.findById(id);
   validateBadRequest(!userExists, 'User not found');
+  validateUserAuthorization(adminId);
 
   const updatedUser = await userRepository.updateUser(id, updatedData);
   return updatedUser;
@@ -233,9 +234,10 @@ const updateUserById = async (id: string, updatedData: Partial<IUser>): Promise<
  * @param {string} id - User ID
  * @returns {Promise<void>}
  */
-const deleteUser = async (id: string): Promise<void> => {
+const deleteUser = async (id: string,adminId:string): Promise<void> => {
   const userExists = await userRepository.findById(id);
   validateBadRequest(!userExists, 'User not found');
+  validateUserAuthorization(adminId);
 
   await userRepository.deleteUser(id);
 };
