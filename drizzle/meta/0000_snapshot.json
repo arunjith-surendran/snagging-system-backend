@@ -1,5 +1,5 @@
 {
-  "id": "77fce9a7-e291-4ffb-baf3-31101b9f5fb3",
+  "id": "25615b61-3c45-4312-a5a8-aefb1cc17701",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -1289,6 +1289,12 @@
         "team_id": {
           "name": "team_id",
           "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "team_name": {
+          "name": "team_name",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },

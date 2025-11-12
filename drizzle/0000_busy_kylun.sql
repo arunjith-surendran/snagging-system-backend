@@ -154,6 +154,7 @@ CREATE TABLE "users" (
 	"password" text NOT NULL,
 	"user_role" "user_role" NOT NULL,
 	"team_id" uuid,
+	"team_name" text,
 	"is_project_admin" boolean DEFAULT false NOT NULL,
 	"is_team_admin" boolean DEFAULT false NOT NULL,
 	"created_user" text,
