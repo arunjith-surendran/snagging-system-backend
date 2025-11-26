@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import path from "path";
 
 // 🔒 Always load production env for deployment
-const envFile = path.resolve(process.cwd(), ".env.production");
+const envFile = path.resolve(process.cwd(), ".env.development");
 
 dotenv.config({ path: envFile });
 
