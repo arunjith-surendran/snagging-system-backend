@@ -19,26 +19,10 @@ interface AppConfig {
 }
 
 const config: AppConfig = {
-<<<<<<< HEAD
-  // 🌐 Server Configuration
-  port: Number(process.env.PORT) || 6000,
-
-  // 🐘 PostgreSQL Configuration
-  postgres: {
-    host: process.env.PGHOST || 'localhost',
-    user: process.env.PGUSER || 'postgres',
-    password: process.env.PGPASSWORD || 'postgres',
-    database: process.env.PGDATABASE || 'snagging_system',
-    port: Number(process.env.PGPORT) || 5433,
-  },
-
-  // 🔐 JWT Configuration
-=======
   port: Number(process.env.PORT) || 5000,
   databaseUrl: process.env.DATABASE_URL || "",
   sslEnabled:
     String(process.env.SSL_ENABLED).trim().toLowerCase() === "true",
->>>>>>> origin/develop
   jwt: {
     secret: process.env.JWT_SECRET || "defaultsecretkey",
     accessExpirationMinutes:
