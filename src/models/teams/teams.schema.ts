@@ -24,13 +24,16 @@ export const teams = pgTable(
     id: uuid("id").defaultRandom().primaryKey(),
     documentStatus: boolean("document_status").notNull().default(true),
 
+    // ✅ Only `teamName` is required
     teamName: text("team_name").notNull(),
+
+    // ✅ All other fields optional
     teamInitials: text("team_initials"),
-    teamType: text("team_type"), // ✅ plain string, not enum
+    teamType: text("team_type"), // plain string (optional)
     teamAddress: text("team_address"),
     teamTelephone: text("team_telephone"),
     teamEmail: text("team_email"),
-    teamRole: teamRoleEnum("team_role"), // ✅ now enum based on UserRole
+    teamRole: teamRoleEnum("team_role").default(UserRole.CONTRACTOR_TEAM), // optional, default
     active: boolean("active").notNull().default(true),
 
     createdUser: text("created_user"),

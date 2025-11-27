@@ -1,5 +1,5 @@
 import { Express, Router, Response, Request } from 'express';
-import { adminRouter, authRouter, buildingRouter, issueRouter, issueTypeRouter, teamRouter, unitRouter, userRouter } from './v1/custom_routes';
+import {  adminRouter, authRouter, buildingRouter, issueRouter, issueTypeRouter, teamRouter, unitRouter, userRouter } from './v1/custom_routes';
 import projectRouter from './v1/custom_routes/project.route';
 
 export const routes = (app: Express) => {
