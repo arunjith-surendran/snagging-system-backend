@@ -4,14 +4,14 @@ import path from "path";
 import { parse } from "pg-connection-string";
 
 // 🧠 Always load production env for Drizzle
-const envFile = path.resolve(process.cwd(), ".env.production");
+const envFile = path.resolve(process.cwd(), ".env.development");
 dotenv.config({ path: envFile });
 console.log(`✅ Loaded environment file for Drizzle: ${envFile}`);
 
 // ✅ Ensure DATABASE_URL is available
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) {
-  throw new Error("❌ DATABASE_URL not found in .env.production");
+  throw new Error("❌ DATABASE_URL not found in .env.development");
 }
 
 // Parse safely

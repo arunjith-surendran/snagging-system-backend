@@ -7,12 +7,12 @@ const drizzle_kit_1 = require("drizzle-kit");
 const dotenv_1 = __importDefault(require("dotenv"));
 const path_1 = __importDefault(require("path"));
 const pg_connection_string_1 = require("pg-connection-string");
-const envFile = path_1.default.resolve(process.cwd(), ".env.production");
+const envFile = path_1.default.resolve(process.cwd(), ".env.development");
 dotenv_1.default.config({ path: envFile });
 console.log(`✅ Loaded environment file for Drizzle: ${envFile}`);
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) {
-    throw new Error("❌ DATABASE_URL not found in .env.production");
+    throw new Error("❌ DATABASE_URL not found in .env.development");
 }
 const parsed = (0, pg_connection_string_1.parse)(databaseUrl);
 exports.default = (0, drizzle_kit_1.defineConfig)({

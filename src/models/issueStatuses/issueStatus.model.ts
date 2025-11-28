@@ -1,7 +1,10 @@
 export interface IIssueStatus {
   id: string;
-  documentStatus: string | null;
+  documentStatus: boolean;
   statusName: string;
+  fullName: string;
+  allowHigherRoles: boolean;
+  isActive: boolean;
   createdUser: string | null;
   createdAt: Date | null;
   updatedUser: string | null;

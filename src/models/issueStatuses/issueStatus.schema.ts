@@ -2,19 +2,22 @@ import {
   pgTable,
   uuid,
   text,
+  boolean,
   timestamp,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { InferSelectModel, InferInsertModel } from "drizzle-orm";
 
-// 🧱 SQL Table Definition
 export const issueStatuses = pgTable(
   "issue_statuses",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    documentStatus: text("document_status").default("active"), // optional logical flag
-    statusName: text("status_name").notNull(), // e.g. Open, Fixed, Verified, Reopened, Closed
+    documentStatus: boolean("document_status").notNull().default(true),
+    statusName: text("status_name").notNull(),
+    fullName: text("full_name").notNull(),
 
+    allowHigherRoles: boolean("allow_higher_roles").notNull().default(false),
+    isActive: boolean("is_active").notNull().default(true),
     createdUser: text("created_user"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
@@ -24,11 +27,8 @@ export const issueStatuses = pgTable(
       .notNull()
       .defaultNow(),
   },
-  (t) => [
-    uniqueIndex("uq_issue_statuses_name").on(t.statusName),
-  ]
+  (t) => [uniqueIndex("uq_issue_statuses_name").on(t.statusName)]
 );
 
-// 🧩 TypeScript Models
-export type IssueStatus = InferSelectModel<typeof issueStatuses>;   // SELECT result type
-export type NewIssueStatus = InferInsertModel<typeof issueStatuses>; // INSERT payload type
+export type IssueStatus = InferSelectModel<typeof issueStatuses>;
+export type NewIssueStatus = InferInsertModel<typeof issueStatuses>;

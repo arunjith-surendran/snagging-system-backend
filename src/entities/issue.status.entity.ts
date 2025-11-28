@@ -1,14 +1,20 @@
 class IssueStatusEntity {
-  public documentStatus: string | null;
+  public documentStatus: boolean;
   public statusName: string;
+  public fullName: string;
+  public allowHigherRoles: boolean;
+  public isActive: boolean;
   public createdUser: string | null;
   public createdAt: Date | null;
   public updatedUser: string | null;
   public updatedAt: Date | null;
 
   constructor(
-    documentStatus: string | null,
+    documentStatus: boolean,
     statusName: string,
+    fullName: string,
+    allowHigherRoles: boolean,
+    isActive: boolean,
     createdUser: string | null,
     createdAt: Date | null,
     updatedUser: string | null,
@@ -16,6 +22,9 @@ class IssueStatusEntity {
   ) {
     this.documentStatus = documentStatus;
     this.statusName = statusName;
+    this.fullName = fullName;
+    this.allowHigherRoles = allowHigherRoles;
+    this.isActive = isActive;
     this.createdUser = createdUser;
     this.createdAt = createdAt;
     this.updatedUser = updatedUser;

@@ -1,6 +1,7 @@
 import { Express, Router, Response, Request } from 'express';
 import {  adminRouter, authRouter, buildingRouter, issueRouter, issueTypeRouter, teamRouter, unitRouter, userRouter } from './v1/custom_routes';
 import projectRouter from './v1/custom_routes/project.route';
+import issueStatusRouter from './v1/custom_routes/issueStatus.route';
 
 export const routes = (app: Express) => {
   const router = Router();
@@ -14,7 +15,8 @@ export const routes = (app: Express) => {
   v1Router.use('/issue-types', issueTypeRouter(Router()));
   v1Router.use('/users', userRouter(Router()));
   v1Router.use('/auth', authRouter(Router()));
-  v1Router.use('/issues', issueRouter(Router()));
+  v1Router.use('/issue', issueRouter(Router()));
+  v1Router.use('/issue-status', issueStatusRouter(Router()));
 
   router.use('/api/v1', v1Router);
 
