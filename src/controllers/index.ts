@@ -7,3 +7,4 @@ export { default as issueTypeController } from './issueType.controller';
 export { default as userController } from './user.controller';
 export { default as authController } from './auth.controller';
 export { default as issueController } from './issue.controller';
+export { default as issueStatusController } from './issueStatus.controller';

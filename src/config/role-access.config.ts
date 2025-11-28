@@ -39,6 +39,13 @@ export const RoleAccessConfig = {
       UserRole.SUB_CONTRACTOR_TEAM, // limited view (own tickets)
       UserRole.QA_VERIFY_TEAM, // verification dashboard
     ],
+     ISSUE_STATUS: [
+      UserRole.SUPER_ADMIN_ADMIN, // full control (CRUD)
+      UserRole.INSPECTOR_TEAM,    // can view allowed statuses
+      UserRole.CONTRACTOR_TEAM,   // view only
+      UserRole.SUB_CONTRACTOR_TEAM, // view only
+      UserRole.QA_VERIFY_TEAM, // view only
+    ],
   },
 
   STATUS_ACCESS: {
