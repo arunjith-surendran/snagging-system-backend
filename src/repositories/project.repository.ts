@@ -56,109 +56,109 @@ const createProject = async (newProject: ProjectEntity): Promise<IProject> => {
 
   return inserted;
 };
-/**
- * ✅ Update Project
- * @function updateProject
- * @param {string} id - Project ID
- * @param {Partial<IProject>} data - Updated fields
- * @returns {Promise<IProject>}
- * @description Updates an existing project record in the database.
- */
-const updateProject = async (id: string, data: Partial<IProject>): Promise<IProject> => {
-  // 🧹 Normalize only date fields
-  const normalizeDate = (value: unknown): Date | null =>
-    value ? new Date(value as string | number | Date) : null;
+// /**
+//  * ✅ Update Project
+//  * @function updateProject
+//  * @param {string} id - Project ID
+//  * @param {Partial<IProject>} data - Updated fields
+//  * @returns {Promise<IProject>}
+//  * @description Updates an existing project record in the database.
+//  */
+// const updateProject = async (id: string, data: Partial<IProject>): Promise<IProject> => {
+//   // 🧹 Normalize only date fields
+//   const normalizeDate = (value: unknown): Date | null =>
+//     value ? new Date(value as string | number | Date) : null;
 
-  // 🧱 Build a safe update payload (remove null/undefined)
-  const safeData = Object.fromEntries(
-    Object.entries({
-      ...data,
-      startDate: data.startDate ? normalizeDate(data.startDate) : undefined,
-      endDate: data.endDate ? normalizeDate(data.endDate) : undefined,
-      updatedAt: new Date(), // always refresh last updated timestamp
-    }).filter(([_, value]) => value !== null && value !== undefined)
-  );
+//   // 🧱 Build a safe update payload (remove null/undefined)
+//   const safeData = Object.fromEntries(
+//     Object.entries({
+//       ...data,
+//       startDate: data.startDate ? normalizeDate(data.startDate) : undefined,
+//       endDate: data.endDate ? normalizeDate(data.endDate) : undefined,
+//       updatedAt: new Date(), // always refresh last updated timestamp
+//     }).filter(([_, value]) => value !== null && value !== undefined)
+//   );
 
-  // 💾 Perform the update safely
-  const [updated] = await db
-    .update(projects)
-    .set(safeData as typeof projects.$inferInsert)
-    .where(eq(projects.id, id))
-    .returning();
+//   // 💾 Perform the update safely
+//   const [updated] = await db
+//     .update(projects)
+//     .set(safeData as typeof projects.$inferInsert)
+//     .where(eq(projects.id, id))
+//     .returning();
 
-  return updated;
-};
+//   return updated;
+// };
 
-/**
- * ✅ Delete Project
- * @function deleteProject
- * @param {string} id - Project ID
- * @returns {Promise<void>}
- * @description Deletes a project record by ID.
- */
-const deleteProject = async (id: string): Promise<void> => {
-  await db.delete(projects).where(eq(projects.id, id));
-};
+// /**
+//  * ✅ Delete Project
+//  * @function deleteProject
+//  * @param {string} id - Project ID
+//  * @returns {Promise<void>}
+//  * @description Deletes a project record by ID.
+//  */
+// const deleteProject = async (id: string): Promise<void> => {
+//   await db.delete(projects).where(eq(projects.id, id));
+// };
 
-/**
- * ✅ Assign Team to Project
- * @function assignTeamToProject
- * @param {string} projectId - Project ID
- * @param {string} teamId - Team ID
- * @returns {Promise<void>}
- * @description Assigns a team to the given project (default: contractor team).
- */
-const assignTeamToProject = async (projectId: string, teamId: string): Promise<void> => {
-  await db.update(projects).set({ assignedContractorId: teamId }).where(eq(projects.id, projectId));
-};
+// /**
+//  * ✅ Assign Team to Project
+//  * @function assignTeamToProject
+//  * @param {string} projectId - Project ID
+//  * @param {string} teamId - Team ID
+//  * @returns {Promise<void>}
+//  * @description Assigns a team to the given project (default: contractor team).
+//  */
+// const assignTeamToProject = async (projectId: string, teamId: string): Promise<void> => {
+//   await db.update(projects).set({ assignedContractorId: teamId }).where(eq(projects.id, projectId));
+// };
 
-/**
- * ✅ Get Projects Assigned to Inspector
- * @function getProjectsByInspector
- * @param {string} userId - Inspector user ID
- * @returns {Promise<IProject[]>}
- * @description Returns all projects assigned to the inspector user/team.
- */
-const getProjectsByInspector = async (userId: string): Promise<IProject[]> => {
-  const result = await db.select().from(projects).where(eq(projects.assignedInspectorId, userId));
-  return result;
-};
+// /**
+//  * ✅ Get Projects Assigned to Inspector
+//  * @function getProjectsByInspector
+//  * @param {string} userId - Inspector user ID
+//  * @returns {Promise<IProject[]>}
+//  * @description Returns all projects assigned to the inspector user/team.
+//  */
+// const getProjectsByInspector = async (userId: string): Promise<IProject[]> => {
+//   const result = await db.select().from(projects).where(eq(projects.assignedInspectorId, userId));
+//   return result;
+// };
 
-/**
- * ✅ Get Projects Assigned to Contractor
- * @function getProjectsByContractor
- * @param {string} userId - Contractor user ID
- * @returns {Promise<IProject[]>}
- * @description Returns all projects assigned to the contractor user/team.
- */
-const getProjectsByContractor = async (userId: string): Promise<IProject[]> => {
-  const result = await db.select().from(projects).where(eq(projects.assignedContractorId, userId));
-  return result;
-};
+// /**
+//  * ✅ Get Projects Assigned to Contractor
+//  * @function getProjectsByContractor
+//  * @param {string} userId - Contractor user ID
+//  * @returns {Promise<IProject[]>}
+//  * @description Returns all projects assigned to the contractor user/team.
+//  */
+// const getProjectsByContractor = async (userId: string): Promise<IProject[]> => {
+//   const result = await db.select().from(projects).where(eq(projects.assignedContractorId, userId));
+//   return result;
+// };
 
-/**
- * ✅ Get Projects Assigned to Sub-Contractor
- * @function getProjectsBySubContractor
- * @param {string} userId - Sub-contractor user ID
- * @returns {Promise<IProject[]>}
- * @description Returns all projects assigned to the sub-contractor team.
- */
-const getProjectsBySubContractor = async (userId: string): Promise<IProject[]> => {
-  const result = await db
-    .select()
-    .from(projects)
-    .where(eq(projects.assignedSubContractorId, userId));
-  return result;
-};
+// /**
+//  * ✅ Get Projects Assigned to Sub-Contractor
+//  * @function getProjectsBySubContractor
+//  * @param {string} userId - Sub-contractor user ID
+//  * @returns {Promise<IProject[]>}
+//  * @description Returns all projects assigned to the sub-contractor team.
+//  */
+// const getProjectsBySubContractor = async (userId: string): Promise<IProject[]> => {
+//   const result = await db
+//     .select()
+//     .from(projects)
+//     .where(eq(projects.assignedSubContractorId, userId));
+//   return result;
+// };
 
 export default {
   getAllProjects,
   getProjectById,
   createProject,
-  updateProject,
-  deleteProject,
-  assignTeamToProject,
-  getProjectsByInspector,
-  getProjectsByContractor,
-  getProjectsBySubContractor,
+  // updateProject,
+  // deleteProject,
+  // assignTeamToProject,
+  // getProjectsByInspector,
+  // getProjectsByContractor,
+  // getProjectsBySubContractor,
 };

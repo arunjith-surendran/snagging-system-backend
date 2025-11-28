@@ -1,23 +1,20 @@
 import { db } from '../db_connection/postgres/connection';
-import { paginate } from '../helper/pagination.helper';
-import { eq, or } from 'drizzle-orm';
+// import { paginate } from '../helper/pagination.helper';
+import { eq, or, desc } from 'drizzle-orm';
 import { issues } from '../models/issues/issues.schema';
 import { IIssue } from '../models/issues/issues.model';
 import IssueEntity from '../entities/issue.entity';
 
 /**
  * ✅ Get all issues (Paginated)
- * @param {number} pageNumber - Page number
- * @param {number} pageSize - Number of items per page
  * @returns {Promise<{ issues: IIssue[]; totalCount: number; hasNext: boolean }>}
  * @description Returns paginated list of all issues.
  */
-const getAllIssues = async (pageNumber: number, pageSize: number): Promise<{ issues: IIssue[]; totalCount: number; hasNext: boolean }> => {
-  const { data, totalCount, hasNext } = await paginate<IIssue>(issues, {
-    pageNumber,
-    pageSize,
-  });
-  return { issues: data, totalCount, hasNext };
+
+const getAllIssues = async (): Promise<{ issues: IIssue[]; totalCount: number }> => {
+  // If you want joins/selected columns, build them here.
+  const data = await db.select().from(issues).orderBy(desc(issues.createdAt));
+  return { issues: data as IIssue[], totalCount: data.length };
 };
 
 /**

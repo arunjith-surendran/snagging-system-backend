@@ -1,0 +1,1 @@
+ALTER TABLE "issues" ADD COLUMN "location" text NOT NULL;

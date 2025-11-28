@@ -16,16 +16,11 @@ import {
  * @description Fetches all issues with pagination.
  */
 const getAllIssues = async (
-  userId: string,
-  pageNumber: number,
-  pageSize: number
-): Promise<{ issues: IIssue[]; totalCount: number; hasNext: boolean }> => {
+  userId: string
+): Promise<{ issues: IIssue[]; totalCount: number;}> => {
   validateUserAuthorization(userId);
-  const { issues, totalCount, hasNext } = await issueRepository.getAllIssues(
-    pageNumber,
-    pageSize
-  );
-  return { issues, totalCount, hasNext };
+  const { issues, totalCount } = await issueRepository.getAllIssues();
+  return { issues, totalCount };
 };
 
 /**
@@ -57,13 +52,16 @@ const createIssue = async (
   issueData: IIssue
 ): Promise<IIssue> => {
   validateUserAuthorization(userId);
-  validateRequiredField(issueData.title, "title");
+  // validateRequiredField(issueData.title, "title");
 
   // 🧱 Construct IssueEntity using positional parameters
+  const safeDueDate = issueData.dueDate
+    ? new Date(issueData.dueDate)
+    : null;
   const issueEntity = new IssueEntity(
     true, 
-    issueData.projectId, // projectId
-    issueData.unitId ?? "", // unitId
+    issueData.projectId,
+    issueData.unitId ?? "", 
     issueData.projectName.trim(), // projectName
     issueData.unitNumber ?? "", // unitNumber
     issueData.status ?? "Open", // status
@@ -74,13 +72,14 @@ const createIssue = async (
     issueData.title.trim(), // title
     issueData.description ?? null, // description
     issueData.priority ?? "Medium", // priority
-    issueData.dueDate ?? null, // dueDate
+    safeDueDate ?? null, // dueDate
     issueData.mediaBase64 ?? null, // mediaBase64
     issueData.mediaContentType ?? null, // mediaContentType
     issueData.comments ?? null, // comments
     issueData.category ?? null, // category
     issueData.issueType ?? null, // issueType
     issueData.issueItem ?? null, // issueItem
+    issueData.location ?? "",
     userId, // createdUser
     new Date(), // createdAt
     userId, // updatedUser
@@ -188,6 +187,7 @@ const createIssueByInspector = async (
     issueData.category ?? null,                   // category
     issueData.issueType ?? null,                  // issueType
     issueData.issueItem ?? null,                  // issueItem
+    issueData.location ?? null, 
     userId,                                       // createdUser
     new Date(),                                   // createdAt
     userId,                                       // updatedUser

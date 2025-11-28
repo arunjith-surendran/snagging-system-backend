@@ -8,6 +8,8 @@ import { eq } from "drizzle-orm";
  * @returns {Promise<Admin>} Newly created admin record
  */
 const create = async (adminEntity: NewAdmin): Promise<Admin> => {
+  console.log(adminEntity, "hello");
+  
   const [newAdmin] = await db.insert(admins).values(adminEntity).returning();
   return newAdmin;
 };
