@@ -61,9 +61,9 @@ const importIssueStatuses = async (filePath: string, userId: string): Promise<{ 
 
     validateBadRequest(!entities.length, 'No valid issue status records found.');
 
-    const now = new Date();
+    // const now = new Date();
 
-    const payload: NewIssueStatus[] = entities.map((e) => ({
+    const payload: any = entities.map((e) => ({
       documentStatus: e.documentStatus,
       statusName: e.statusName,
       fullName: e.fullName,
