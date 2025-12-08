@@ -11,9 +11,4 @@ export interface IProject {
   description?: string | null;
   clientName?: string | null;
 
-  // 🧾 Audit Trail
-  createdUser?: string | null;
-  createdAt?: Date | string | null;
-  updatedUser?: string | null;
-  updatedAt?: Date | string | null;
 }

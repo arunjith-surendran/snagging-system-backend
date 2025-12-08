@@ -23,15 +23,6 @@ export const projects = pgTable(
     description: text("description"),
     clientName: text("client_name"),
 
-    // 🧾 Audit Trail
-    createdUser: text("created_user"),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-    updatedUser: text("updated_user"),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
   },
   (t) => [uniqueIndex("uq_projects_code").on(t.projectCode)]
 );
