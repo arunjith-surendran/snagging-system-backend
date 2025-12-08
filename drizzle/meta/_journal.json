@@ -5,36 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1762430434691,
-      "tag": "0000_busy_kylun",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1762152317555,
-      "tag": "0001_whole_thundra",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1762167533322,
-      "tag": "0002_quiet_arachne",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1762174628197,
-      "tag": "0003_deep_blur",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1762239199987,
-      "tag": "0004_smooth_galactus",
+      "when": 1765180013475,
+      "tag": "0000_crazy_peter_quill",
       "breakpoints": true
     }
   ]

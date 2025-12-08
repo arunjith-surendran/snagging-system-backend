@@ -49,6 +49,7 @@ const createUser = async (userData: IUser, createdBy: string | null): Promise<IU
     teamName = team ? team.teamName : null;
   }
 
+  // ⭐ FIX: Force NULL for fields that must not become DEFAULT
   const userEntity = new UserEntity(
     true,
     userData.fullName.trim(),
@@ -56,17 +57,18 @@ const createUser = async (userData: IUser, createdBy: string | null): Promise<IU
     hashedPassword,
     userData.userRole,
     userData.teamId ?? null,
-    teamName,
-    userData.isProjectAdmin ?? false,
-    userData.isTeamAdmin ?? false,
-    createdBy,
+    teamName ?? null,             // ⭐ Force NULL
+    Boolean(userData.isProjectAdmin),
+    Boolean(userData.isTeamAdmin),
+    createdBy ?? null,            // ⭐ Force NULL
     new Date(),
-    userData.updatedUser ?? null,
-    new Date(),
+    null,                         // ⭐ Must be NULL (not undefined)
+    new Date()
   );
 
   return await userRepository.createUser(userEntity);
 };
+
 
 /**
  * ✅ Import Users (CSV/Excel)

@@ -1,5 +1,5 @@
 {
-  "id": "25615b61-3c45-4312-a5a8-aefb1cc17701",
+  "id": "bbd9385a-7397-4834-939d-3aa6ea785c6e",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -353,6 +353,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "location": {
+          "name": "location",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
         "created_user": {
           "name": "created_user",
           "type": "text",
@@ -571,16 +577,36 @@
         },
         "document_status": {
           "name": "document_status",
-          "type": "text",
+          "type": "boolean",
           "primaryKey": false,
-          "notNull": false,
-          "default": "'active'"
+          "notNull": true,
+          "default": true
         },
         "status_name": {
           "name": "status_name",
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "full_name": {
+          "name": "full_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "allow_higher_roles": {
+          "name": "allow_higher_roles",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
         },
         "created_user": {
           "name": "created_user",
@@ -637,70 +663,30 @@
       "name": "issue_types",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "document_status": {
-          "name": "document_status",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'active'"
-        },
-        "category": {
-          "name": "category",
+        "Category": {
+          "name": "Category",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "type": {
-          "name": "type",
+        "Type": {
+          "name": "Type",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "item": {
-          "name": "item",
+        "Item": {
+          "name": "Item",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "current": {
-          "name": "current",
+        "Current": {
+          "name": "Current",
           "type": "boolean",
           "primaryKey": false,
           "notNull": true,
           "default": true
-        },
-        "created_user": {
-          "name": "created_user",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_user": {
-          "name": "updated_user",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
         }
       },
       "indexes": {
@@ -708,19 +694,19 @@
           "name": "uq_issue_types_combination",
           "columns": [
             {
-              "expression": "category",
+              "expression": "Category",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
             },
             {
-              "expression": "type",
+              "expression": "Type",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
             },
             {
-              "expression": "item",
+              "expression": "Item",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -780,80 +766,6 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false
-        },
-        "location": {
-          "name": "location",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "phase": {
-          "name": "phase",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "assigned_inspector_id": {
-          "name": "assigned_inspector_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "assigned_contractor_id": {
-          "name": "assigned_contractor_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "assigned_sub_contractor_id": {
-          "name": "assigned_sub_contractor_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "assigned_verifier_id": {
-          "name": "assigned_verifier_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "start_date": {
-          "name": "start_date",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "end_date": {
-          "name": "end_date",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_user": {
-          "name": "created_user",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_user": {
-          "name": "updated_user",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
         }
       },
       "indexes": {

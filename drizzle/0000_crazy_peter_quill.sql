@@ -51,6 +51,7 @@ CREATE TABLE "issues" (
 	"category" text,
 	"issue_type" text,
 	"issue_item" text,
+	"location" text NOT NULL,
 	"created_user" text,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_user" text,
@@ -59,8 +60,11 @@ CREATE TABLE "issues" (
 --> statement-breakpoint
 CREATE TABLE "issue_statuses" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"document_status" text DEFAULT 'active',
+	"document_status" boolean DEFAULT true NOT NULL,
 	"status_name" text NOT NULL,
+	"full_name" text NOT NULL,
+	"allow_higher_roles" boolean DEFAULT false NOT NULL,
+	"is_active" boolean DEFAULT true NOT NULL,
 	"created_user" text,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_user" text,
@@ -68,16 +72,10 @@ CREATE TABLE "issue_statuses" (
 );
 --> statement-breakpoint
 CREATE TABLE "issue_types" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"document_status" text DEFAULT 'active',
-	"category" text NOT NULL,
-	"type" text NOT NULL,
-	"item" text NOT NULL,
-	"current" boolean DEFAULT true NOT NULL,
-	"created_user" text,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_user" text,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+	"Category" text NOT NULL,
+	"Type" text NOT NULL,
+	"Item" text NOT NULL,
+	"Current" boolean DEFAULT true NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "projects" (
@@ -86,19 +84,7 @@ CREATE TABLE "projects" (
 	"project_code" text NOT NULL,
 	"project_name" text NOT NULL,
 	"description" text,
-	"client_name" text,
-	"location" text,
-	"phase" text,
-	"assigned_inspector_id" uuid,
-	"assigned_contractor_id" uuid,
-	"assigned_sub_contractor_id" uuid,
-	"assigned_verifier_id" uuid,
-	"start_date" timestamp with time zone,
-	"end_date" timestamp with time zone,
-	"created_user" text,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_user" text,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+	"client_name" text
 );
 --> statement-breakpoint
 CREATE TABLE "teams" (
@@ -183,7 +169,7 @@ CREATE INDEX "idx_issues_assigned_team" ON "issues" USING btree ("assigned_team"
 CREATE INDEX "idx_issues_assigned_user" ON "issues" USING btree ("assigned_user");--> statement-breakpoint
 CREATE INDEX "idx_issues_due" ON "issues" USING btree ("due_date");--> statement-breakpoint
 CREATE UNIQUE INDEX "uq_issue_statuses_name" ON "issue_statuses" USING btree ("status_name");--> statement-breakpoint
-CREATE UNIQUE INDEX "uq_issue_types_combination" ON "issue_types" USING btree ("category","type","item");--> statement-breakpoint
+CREATE UNIQUE INDEX "uq_issue_types_combination" ON "issue_types" USING btree ("Category","Type","Item");--> statement-breakpoint
 CREATE UNIQUE INDEX "uq_projects_code" ON "projects" USING btree ("project_code");--> statement-breakpoint
 CREATE UNIQUE INDEX "uq_teams_team_name" ON "teams" USING btree ("team_name");--> statement-breakpoint
 CREATE INDEX "idx_units_building" ON "units" USING btree ("building_id");--> statement-breakpoint
