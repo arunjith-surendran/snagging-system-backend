@@ -4,7 +4,6 @@ import {
   uuid,
   text,
   boolean,
-  timestamp,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { InferSelectModel, InferInsertModel } from "drizzle-orm";
