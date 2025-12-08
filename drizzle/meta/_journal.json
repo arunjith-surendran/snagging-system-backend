@@ -8,6 +8,13 @@
       "when": 1765180013475,
       "tag": "0000_crazy_peter_quill",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1765185317873,
+      "tag": "0001_fuzzy_quasimodo",
+      "breakpoints": true
     }
   ]
 }

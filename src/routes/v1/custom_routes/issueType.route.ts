@@ -1,14 +1,26 @@
-import { Router } from "express";
-import { issueTypeController } from "../../../controllers";
-import { verifyAuth } from "../../../middlewares/auth/verify-auth";
-import { authorizeModule } from "../../../middlewares/auth/authorize-access";
+import { Router } from 'express';
+import { issueTypeController } from '../../../controllers';
+import { upload } from '../../../middlewares/upload/file-upload.middleware';
+import { verifyAuth } from '../../../middlewares/auth/verify-auth';
+import { authorizeModule } from '../../../middlewares/auth/authorize-access';
 
 const issueTypeRouter = (router: Router): Router => {
-  router.get("/get-all", verifyAuth, authorizeModule("ADMIN"), issueTypeController.getAllIssueTypes);
-  // router.get("/get/:id", verifyAuth, authorizeModule("ADMIN"), issueTypeController.getIssueTypeById);
-  // router.post("/create", verifyAuth, authorizeModule("ADMIN"), issueTypeController.createIssueType);
-  // router.put("/update/:id", verifyAuth, authorizeModule("ADMIN"), issueTypeController.updateIssueType);
-  // router.delete("/delete/:id", verifyAuth, authorizeModule("ADMIN"), issueTypeController.deleteIssueType);
+  router.post('/upload', verifyAuth, authorizeModule('ISSUE_TYPES'), upload.single('file'), issueTypeController.uploadIssueTypes);
+
+  router.get('/get-all-types', verifyAuth, authorizeModule('ISSUE_TYPES'), issueTypeController.getAllIssueTypes);
+
+  router.get('/download/excel', verifyAuth, authorizeModule('ISSUE_TYPES'), issueTypeController.downloadIssueTypesExcel);
+
+  router.get('/download/csv', verifyAuth, authorizeModule('ISSUE_TYPES'), issueTypeController.downloadIssueTypesCsv);
+
+  router.post('/admin/add', verifyAuth, authorizeModule('ADMIN'), issueTypeController.addIssueType);
+
+  router.put('/admin/update/:id', verifyAuth, authorizeModule('ADMIN'), issueTypeController.updateIssueType);
+
+  router.delete('/admin/delete/:id', verifyAuth, authorizeModule('ADMIN'), issueTypeController.deleteIssueType);
+
+  router.get('/admin/get/:id', verifyAuth, authorizeModule('ADMIN'), issueTypeController.getIssueTypeById);
+
   return router;
 };
 
