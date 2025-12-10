@@ -1,4 +1,5 @@
 // src/models/admin/admin.schema.ts
+
 import {
   pgTable,
   uuid,
@@ -14,7 +15,11 @@ export const admins = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
 
-    documentStatus: boolean("document_status").notNull().default(true),
+    // 🔥 FIXED: correct column name instead of "n"
+    documentStatus: boolean("document_status")
+      .notNull()
+      .default(true),
+
     adminUserName: text("admin_user_name").notNull(),
     adminUserType: text("admin_user_type").notNull(), // stored as string
     email: text("email").notNull(),
@@ -28,6 +33,6 @@ export const admins = pgTable(
   (t) => [uniqueIndex("uq_admins_email").on(t.email)]
 );
 
-// ✅ Type helpers
-export type Admin = InferSelectModel<typeof admins>;   // SELECT
-export type NewAdmin = InferInsertModel<typeof admins>; // INSERT
+// Types
+export type Admin = InferSelectModel<typeof admins>;
+export type NewAdmin = InferInsertModel<typeof admins>;
